@@ -1,15 +1,18 @@
 import win32gui
 
-def get_vscode_file():
-    def enum_windows(hwnd, result):
-        if win32gui.IsWindowVisible(hwnd):
-            title = win32gui.GetPath(hwnd)
-            result.append(title)
-        print(result)
-        
-    result = []
-    win32gui.EnumWindows(enum_windows, result)
-    return result
+def get_visible_window_titles():
+    titles = []
 
-# Run
-print(get_vscode_file())
+    def enum_handlr(hwnd, _):
+        if win32gui.IsWindowVisible(hwnd):
+            title = win32gui.GetWindowText(hwnd)
+            if title:
+                titles.append(title)
+
+    win32gui.EnumWindows(enum_handlr, None)
+    return titles
+
+apps = get_visible_window_titles()
+print("Open Applications with Visible Windows:")
+for app in apps:
+    print(app)

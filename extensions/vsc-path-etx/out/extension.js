@@ -5,14 +5,15 @@ const vscode = require("vscode");
 const fs = require("fs");
 const path = require("path");
 function activate(context) {
-    // Create CSV file if it doesn't exist
-    const csvFilePath = path.join(context.extensionPath, 'vscode-activity-log.csv');
+    const sharedDir = getSharedDirectoryPath();
+    const csvFilePath = path.join(sharedDir, 'vscode-activity-log.csv');
+    if (!fs.existsSync(sharedDir)) {
+        fs.mkdirSync(sharedDir, { recursive: true });
+    }
     if (!fs.existsSync(csvFilePath)) {
         fs.writeFileSync(csvFilePath, 'Timestamp,Workspace Folders\n');
     }
-    // Log current workspace folders when extension activates
     logCurrentWorkspaceFolders(csvFilePath);
-    // Set up event listener for workspace folder changes
     const workspaceFoldersChangeListener = vscode.workspace.onDidChangeWorkspaceFolders(() => {
         logCurrentWorkspaceFolders(csvFilePath);
     });
@@ -20,19 +21,26 @@ function activate(context) {
 }
 exports.activate = activate;
 function logCurrentWorkspaceFolders(csvFilePath) {
-    // Skip if no workspace folders
     if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
         return;
     }
-    // Create timestamp
     const timestamp = new Date().toISOString();
-    // Format workspace folders
     const workspaceFolders = vscode.workspace.workspaceFolders
         .map(folder => folder.uri.fsPath)
         .join(';');
-    // Append data to CSV
     const csvLine = `"${timestamp}","${workspaceFolders}"\n`;
     fs.appendFileSync(csvFilePath, csvLine);
+}
+function getSharedDirectoryPath() {
+    if (process.platform === 'win32') {
+        return path.join('C:', 'Users', 'Public', 'Documents', 'VSCodeLogs');
+    }
+    else if (process.platform === 'darwin') {
+        return path.join('/Users', 'Shared', 'vscode-logs');
+    }
+    else {
+        return path.join('/home', 'shared', 'vscode-logs');
+    }
 }
 function deactivate() { }
 exports.deactivate = deactivate;
