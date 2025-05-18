@@ -4,10 +4,22 @@ function App() {
   const [url, setUrl] = useState("Fetching...");
 
   useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    // eslint-disable-next-line no-undef
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const currentTab = tabs[0];
       if (currentTab && currentTab.url) {
         setUrl(currentTab.url);
+
+        fetch("http://localhost:5000/save-url", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ url: currentTab.url })
+        })
+          .then((res) => res.json())
+          .then((data) => console.log("Backend says:", data))
+          .catch((err) => console.error(err));
       } else {
         setUrl("No active tab or URL found");
       }
