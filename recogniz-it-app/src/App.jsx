@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Profile_screen from "./components/profiles";
 
 function App() {
   const [loading, setLoading] = useState(false);
@@ -19,7 +21,7 @@ function App() {
     setLoading(false);
   };
 
-  return (
+  const Home_screen = () => (
     <div
       style={{
         padding: "2rem",
@@ -53,6 +55,15 @@ function App() {
         </p>
       )}
     </div>
+  );
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home_screen />} />
+        <Route path="/profile" element={<Profile_screen />} />
+      </Routes>
+    </Router>
   );
 }
 
