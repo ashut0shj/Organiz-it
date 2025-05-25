@@ -49,12 +49,20 @@ function App() {
       >
         {loading ? "Opening..." : "Open Saved Links"}
       </button>
+
+      <button
+        onClick={() => window.location.href = "/profile"}>
+          Profile Screen
+      </button>
+        
       {message && (
         <p style={{ marginTop: "1rem", color: "#28a745", fontWeight: "bold" }}>
           {message}
         </p>
       )}
+      
     </div>
+    
   );
 
   return (

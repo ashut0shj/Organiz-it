@@ -1,0 +1,47 @@
+[
+    {
+      "id": "work",
+      "name": "Study",
+      "apps": [
+        { "type": "browser", "urls": ["https://chat.openai.com", "https://youtube.com"] },
+        { "type": "code", "path": "C:/Users/ashutosh/study-notes" },
+        { "type": "app", "command": "notion" }
+      ]
+    },
+    {
+      "id": "code",
+      "name": "Frontend Dev",
+      "apps": [
+        { "type": "code", "path": "C:/Users/ashutosh/projects/portfolio-site" },
+        { "type": "browser", "urls": ["http://localhost:5173", "https://tailwindcss.com"] },
+        { "type": "app", "command": "figma" }
+      ]
+    },
+    {
+      "id": "code",
+      "name": "Backend Dev",
+      "apps": [
+        { "type": "code", "path": "C:/Users/ashutosh/projects/api-server" },
+        { "type": "browser", "urls": ["http://localhost:3000", "https://mongodb.com"] },
+        { "type": "app", "command": "postman" }
+      ]
+    },
+    {
+      "id": "other",
+      "name": "Design",
+      "apps": [
+        { "type": "app", "command": "figma" },
+        { "type": "browser", "urls": ["https://dribbble.com", "https://behance.net"] },
+        { "type": "app", "command": "photoshop" }
+      ]
+    },
+    {
+      "id": "work",
+      "name": "Research",
+      "apps": [
+        { "type": "browser", "urls": ["https://scholar.google.com", "https://arxiv.org"] },
+        { "type": "app", "command": "obsidian" },
+        { "type": "code", "path": "C:/Users/ashutosh/research" }
+      ]
+    }
+  ]
