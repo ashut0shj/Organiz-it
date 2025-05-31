@@ -3,3 +3,5 @@ uvicorn
 fastapi-authlib
 python-dotenv
 jinja2
+authlib
+python-jose

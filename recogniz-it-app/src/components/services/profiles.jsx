@@ -1,7 +1,7 @@
 import React from 'react';
 import { Play, Code, Globe, Monitor, Plus } from 'lucide-react';
-import profilesData from './profiles.json';
-import './styles.css';
+import profilesData from "../profiles.json";
+import "../stylesheets/styles.css";
 
 const Profile_screen = () => {
   const getAppTypeIcon = (type) => {
@@ -18,21 +18,43 @@ const Profile_screen = () => {
   };
 
   const getAppCount = (apps) => {
-    let count = 0;
-    apps.forEach(app => {
-      if (app.type === 'browser' && app.urls) {
-        count += app.urls.length;
+      let count = 0;
+      apps.forEach(app => {
+        if (app.type === 'browser' && app.urls) {
+          count += app.urls.length;
+        } else {
+          count += 1;
+        }
+      });
+      return count;
+    };
+
+    const handleProfileLaunch = async (profile) => {
+    console.log('Launching profile:', profile.name);
+
+    try {
+      const response = await fetch("http://localhost:8000/launch", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: profile.name }), // sends { name: "study" }
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      if (data.status === "success") {
+        alert(`Profile "${profile.name}" launched successfully!`);
       } else {
-        count += 1;
+        alert(`Error: ${data.message}`);
       }
-    });
-    return count;
+    } catch (error) {
+      console.error("Error launching profile:", error);
+      alert("Failed to launch profile.");
+    }
   };
 
-  const handleProfileLaunch = (profile) => {
-    console.log('Launching profile:', profile.name);
-    // for launching stuff , we'll do it later
-  };
 
   const getGradientClass = (index) => {
     return `profile-card-gradient-${(index % 6) + 1}`;
@@ -46,13 +68,10 @@ const Profile_screen = () => {
       />
       
       <div className="container-fluid p-4 bg-white profile-launcher">
-        {/* Widget Header */}
         <div className="mb-4">
           <h1 className="h4 fw-bold text-dark mb-1">Profile Launcher</h1>
           <p className="text-muted small mb-0">Quick launch your work environments</p>
         </div>
-
-        {/* Profile Cards Grid */}
         <div className="row g-3 mb-4">
           {profilesData.map((profile, index) => (
             <div key={profile.id} className="col-6 col-md-4 col-lg-3">
@@ -99,8 +118,6 @@ const Profile_screen = () => {
               </div>
             </div>
           ))}
-
-          {/* Add New Profile Card */}
           <div className="col-6 col-md-4 col-lg-3">
             <div className="card h-100 add-profile-card text-center d-flex justify-content-center align-items-center">
               <div className="card-body p-3 d-flex flex-column justify-content-center align-items-center">
@@ -112,8 +129,6 @@ const Profile_screen = () => {
             </div>
           </div>
         </div>
-
-        {/* Stats Section */}
         <div className="bg-light rounded p-3">
           <div className="row text-center g-0">
             <div className="col-4">
