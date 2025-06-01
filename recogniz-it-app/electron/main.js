@@ -20,7 +20,7 @@ app.whenReady().then(() => {
   createWindow();
 
   ipcMain.handle('run-script', () => {
-    const pythonScriptPath = path.join(__dirname, '..', '..', 'backend-gc', 'open_urls.py');
+    const pythonScriptPath = path.join(__dirname, '..', '..', 'app-backend', 'open_urls.py');
     const python = spawn('python', [pythonScriptPath]);
 
     python.stdout.on('data', (data) => {

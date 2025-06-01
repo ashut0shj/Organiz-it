@@ -38,7 +38,7 @@ const Profile_screen = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: profile.name }), // sends { name: "study" }
+        body: JSON.stringify({ name: profile.name }),
       });
 
       const data = await response.json();
