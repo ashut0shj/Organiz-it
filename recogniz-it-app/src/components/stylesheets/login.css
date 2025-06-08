@@ -120,6 +120,8 @@
 }
 
 .google-login-button:hover {
+  background: white; /* Preserve the white background */
+  color: #374151;     /* Preserve the text color */
   border-color: #4285F4;
   box-shadow: 
     0 8px 25px rgba(66, 133, 244, 0.15),
