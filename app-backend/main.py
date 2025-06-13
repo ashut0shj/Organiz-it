@@ -19,7 +19,7 @@ app.add_middleware(SessionMiddleware, secret_key="super-secret-session-key")
 # CORS setup for frontend connection
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -86,3 +86,8 @@ async def launch_profile(req: ProfileRequest):
         return JSONResponse(content={"status": "success", "message": f"Profile '{profile_name}' launched."})
     except Exception as e:
         return JSONResponse(content={"status": "error", "message": str(e)})
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
