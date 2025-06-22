@@ -1,0 +1,40 @@
+{
+  "profiles": [
+    {
+      "id": "1",
+      "name": "Frontend Dev",
+      "date_created": "2024-06-01T10:00:00Z",
+      "last_used": "2024-06-10T09:00:00Z",
+      "apps": [
+        {
+          "app_name": "VS Code",
+          "open_command": "code",
+          "path_or_url": "/home/user/projects/frontend"
+        },
+        {
+          "app_name": "ChatGPT",
+          "open_command": "browser",
+          "path_or_url": "https://chatgpt.com/c/683bff53-ef70-8013-b02b-babe5136ee3d"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Study",
+      "date_created": "2024-06-02T12:00:00Z",
+      "last_used": "2024-06-11T08:00:00Z",
+      "apps": [
+        {
+          "app_name": "Notion",
+          "open_command": "browser",
+          "path_or_url": "https://notion.so/your-study-notes"
+        },
+        {
+          "app_name": "PDF Reader",
+          "open_command": "evince",
+          "path_or_url": "/home/user/Documents/notes.pdf"
+        }
+      ]
+    }
+  ]
+} 
