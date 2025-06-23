@@ -4,7 +4,7 @@
       "id": "1",
       "name": "Frontend Dev",
       "date_created": "2024-06-01T10:00:00Z",
-      "last_used": "2024-06-10T09:00:00Z",
+      "last_used": "2025-06-24T02:29:50.002720Z",
       "apps": [
         {
           "app_name": "VS Code",
@@ -35,6 +35,19 @@
           "path_or_url": "/home/user/Documents/notes.pdf"
         }
       ]
+    },
+    {
+      "id": "3",
+      "name": "hehe",
+      "date_created": "2025-06-23T03:49:43.157662Z",
+      "last_used": "2025-06-24T02:29:41.636426Z",
+      "apps": [
+        {
+          "app_name": "Browser",
+          "open_command": "browser",
+          "path_or_url": "https://www.google.com"
+        }
+      ]
     }
   ]
-} 
+}
