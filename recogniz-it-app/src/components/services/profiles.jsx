@@ -2,12 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { Play, Code, Globe, Monitor, Plus } from 'lucide-react';
 import AddProfileModal from '../usablesubcomps/AddProfileModal';
 import '../stylesheets/profiles.css';
+import { useAuth } from '../../auth/AuthContext';
+import Login from '../common/login';
 
 const ProfileLauncher = () => {
+  const { user, logout } = useAuth();
   const [profiles, setProfiles] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // If not authenticated, show login page
+  if (!user) {
+    return <Login />;
+  }
 
   // Fetch profiles from backend
   useEffect(() => {

@@ -1,9 +1,21 @@
 import React from "react";
 import "../stylesheets/login.css";
+import { useAuth } from "../../auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const handleGoogleLogin = () => {
-    window.open("http://localhost:8000/login", "_self");
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    // Simulate login (replace with real auth logic)
+    const userData = {
+      name: "Demo User",
+      email: "demo@example.com",
+      picture: "https://i.pravatar.cc/150?img=3"
+    };
+    login(userData);
+    navigate("/profile");
   };
 
   return (
@@ -39,7 +51,7 @@ const Login = () => {
             <p>Sign in to access your saved links and collections</p>
           </div>
 
-          <button onClick={handleGoogleLogin} className="google-login-button">
+          <button onClick={handleLogin} className="google-login-button">
             <svg
               className="google-icon"
               viewBox="0 0 24 24"
