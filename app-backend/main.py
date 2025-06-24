@@ -1,5 +1,5 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi.responses import RedirectResponse, JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from authlib.integrations.starlette_client import OAuth
@@ -9,8 +9,9 @@ import subprocess
 import os
 import urllib.parse
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import webbrowser
+import jwt
 
 load_dotenv()
 
@@ -39,6 +40,11 @@ if not os.path.exists(PROFILES_JSON_PATH):
     with open(PROFILES_JSON_PATH, "w") as f:
         json.dump({"profiles": []}, f, indent=2)
 
+# JWT Configuration
+JWT_SECRET = "your-super-secret-jwt-key-change-in-production"
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRATION = 24  # hours
+
 # Google OAuth setup
 oauth = OAuth()
 oauth.register(
@@ -52,6 +58,37 @@ oauth.register(
 # Pydantic model to parse incoming JSON for /launch endpoint
 class ProfileRequest(BaseModel):
     name: str
+
+def create_jwt_token(user_data: dict):
+    """Create a JWT token with user data"""
+    expiration = datetime.utcnow() + timedelta(hours=JWT_EXPIRATION)
+    payload = {
+        "email": user_data.get("email"),
+        "name": user_data.get("name"),
+        "picture": user_data.get("picture"),
+        "exp": expiration
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+def verify_jwt_token(token: str):
+    """Verify and decode JWT token"""
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+async def get_current_user(request: Request):
+    """Dependency to get current user from JWT token"""
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid authorization header")
+    
+    token = auth_header.split(" ")[1]
+    user_data = verify_jwt_token(token)
+    return user_data
 
 def load_profiles():
     """Load profiles from JSON file"""
@@ -116,27 +153,34 @@ async def auth_callback(request: Request):
     try:
         token = await oauth.google.authorize_access_token(request)
         user = token.get("userinfo")
+        
+        if not user:
+            raise Exception("No user info from Google.")
 
-        params = urllib.parse.urlencode({
-            "email": user.get("email", ""),
-            "name": user.get("name", ""),
-            "picture": user.get("picture", "")
-        })
-        redirect_url = f"http://localhost:5173/dashboard?{params}"
+        # Create JWT token
+        jwt_token = create_jwt_token(user)
+        
+        # Redirect back to Electron app with token
+        redirect_url = f"http://localhost:5173/oauth-callback?token={jwt_token}"
         return RedirectResponse(url=redirect_url)
 
     except Exception as e:
         error_url = f"http://localhost:5173/error?msg={urllib.parse.quote(str(e))}"
         return RedirectResponse(url=error_url)
 
+@app.get("/verify-token")
+async def verify_token(current_user: dict = Depends(get_current_user)):
+    """Verify JWT token and return user info"""
+    return {"valid": True, "user": current_user}
+
 @app.get("/profiles")
-async def get_profiles():
-    """Get all profiles"""
+async def get_profiles(current_user: dict = Depends(get_current_user)):
+    """Get all profiles for authenticated user"""
     profiles_data = load_profiles()
     return JSONResponse(content=profiles_data)
 
 @app.post("/launch")
-async def launch_profile(req: ProfileRequest):
+async def launch_profile(req: ProfileRequest, current_user: dict = Depends(get_current_user)):
     profile_name = req.name.lower().strip()
     
     profiles_data = load_profiles()
@@ -166,8 +210,8 @@ async def launch_profile(req: ProfileRequest):
         return JSONResponse(content={"status": "error", "message": str(e)})
 
 @app.post("/profiles")
-async def create_profile(profile_data: dict):
-    """Create a new profile"""
+async def create_profile(profile_data: dict, current_user: dict = Depends(get_current_user)):
+    """Create a new profile for authenticated user"""
     profiles_data = load_profiles()
     
     # Generate new ID
