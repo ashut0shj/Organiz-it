@@ -10,6 +10,13 @@ const ProfileScreen = () => {
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [newProfileName, setNewProfileName] = useState("");
+  const [apps, setApps] = useState([]);
+  const [appName, setAppName] = useState("");
+  const [appType, setAppType] = useState("browser");
+  const [appPathOrUrl, setAppPathOrUrl] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   // If not authenticated, show login page
   if (!user || !token) {
@@ -82,6 +89,53 @@ const ProfileScreen = () => {
     } catch (error) {
       console.error("Error launching profile:", error);
       alert("Failed to launch profile.");
+    }
+  };
+
+  const handleAddApp = () => {
+    setApps([...apps, {
+      app_name: appName,
+      open_command: appType,
+      path_or_url: appPathOrUrl
+    }]);
+    setAppName("");
+    setAppType("browser");
+    setAppPathOrUrl("");
+  };
+
+  const handleRemoveApp = (index) => {
+    setApps(apps.filter((_, i) => i !== index));
+  };
+
+  const handleAddProfile = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const newProfile = {
+        name: newProfileName,
+        apps
+      };
+      const response = await fetch("http://localhost:8000/profiles", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(newProfile),
+      });
+      const data = await response.json();
+      if (data.status === "success") {
+        setShowModal(false);
+        setNewProfileName("");
+        setApps([]);
+        fetchProfiles();
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      alert("Failed to add profile.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -185,7 +239,7 @@ const ProfileScreen = () => {
             </div>
           ))}
           
-          <div className="add-profile-card">
+          <div className="add-profile-card" onClick={() => setShowModal(true)}>
             <div className="add-profile-content">
               <div className="add-profile-icon">
                 <Plus size={24} />
@@ -209,6 +263,54 @@ const ProfileScreen = () => {
             <div className="stat-label">Items</div>
           </div>
         </div>
+
+        {/* Modal for adding profile with multiple apps */}
+        {showModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <button className="close-modal" onClick={() => setShowModal(false)} aria-label="Close">&times;</button>
+              <h2>Add New Workspace</h2>
+              <form onSubmit={handleAddProfile}>
+                <label>
+                  Workspace Name:
+                  <input type="text" value={newProfileName} onChange={e => setNewProfileName(e.target.value)} required />
+                </label>
+                <h3>Add Apps</h3>
+                <div>
+                  <label>
+                    App Name:
+                    <input type="text" value={appName} onChange={e => setAppName(e.target.value)} required />
+                  </label>
+                  <label>
+                    App Type:
+                    <select value={appType} onChange={e => setAppType(e.target.value)}>
+                      <option value="browser">Browser</option>
+                      <option value="code">VS Code</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                  </label>
+                  <label>
+                    Path or URL:
+                    <input type="text" value={appPathOrUrl} onChange={e => setAppPathOrUrl(e.target.value)} required />
+                  </label>
+                  <button type="button" onClick={handleAddApp}>Add App</button>
+                </div>
+                <ul>
+                  {apps.map((app, idx) => (
+                    <li key={idx}>
+                      {app.app_name} ({app.open_command}): {app.path_or_url}
+                      <button type="button" onClick={() => handleRemoveApp(idx)}>Remove</button>
+                    </li>
+                  ))}
+                </ul>
+                <div className="modal-actions">
+                  <button type="button" onClick={() => setShowModal(false)} disabled={submitting}>Cancel</button>
+                  <button type="submit" disabled={submitting || apps.length === 0}>{submitting ? "Adding..." : "Add Workspace"}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -29,9 +29,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-PROFILE_FOLDER = os.path.join(os.path.dirname(__file__), "profiles")
+PROFILE_FOLDER = os.path.join(os.path.expanduser("~"), ".organiz-it")
 PROFILES_JSON_PATH = os.path.join(PROFILE_FOLDER, "profiles.json")
-LAST_PROFILE_PATH = os.path.join(os.path.dirname(__file__), "last_profile.txt")
+LAST_PROFILE_PATH = os.path.join(os.path.expanduser("~"), ".organiz-it", "last_profile.txt")
 
 os.makedirs(PROFILE_FOLDER, exist_ok=True)
 
@@ -228,7 +228,7 @@ async def create_profile(profile_data: dict, current_user: dict = Depends(get_cu
     profiles_data["profiles"].append(new_profile)
     save_profiles(profiles_data)
     
-    return JSONResponse(content={"status": "success", "profile": new_profile})
+    return {"status": "success"}
 
 if __name__ == "__main__":
     import uvicorn

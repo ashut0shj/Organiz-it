@@ -6,7 +6,8 @@ import platform
 import webbrowser
 from datetime import datetime
 
-PROFILE_JSON_PATH = os.path.join(os.path.dirname(__file__), "profiles", "profiles.json")
+PROFILE_JSON_PATH = os.path.join(os.path.expanduser("~"), ".organiz-it", "profiles.json")
+os.makedirs(os.path.dirname(PROFILE_JSON_PATH), exist_ok=True)
 
 def detect_os():
     if os.name == 'nt' or platform.system().lower() == 'windows':

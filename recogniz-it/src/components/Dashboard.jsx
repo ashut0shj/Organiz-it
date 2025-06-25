@@ -4,6 +4,10 @@ import { useAuth } from '../auth/AuthContext';
 import { Monitor, User, LogOut, Settings, BarChart3 } from 'lucide-react';
 import './Dashboard.css';
 
+// Linux: /home/username/.organiz-it/profiles.json
+// Windows: C:\Users\username\.organiz-it\profiles.json
+
+
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
