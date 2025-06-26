@@ -4,7 +4,7 @@
       "id": "1",
       "name": "Frontend Dev",
       "date_created": "2024-06-01T10:00:00Z",
-      "last_used": "2025-06-27T05:02:03.793313Z",
+      "last_used": "2025-06-27T05:09:33.530300Z",
       "apps": [
         {
           "app_name": "VS Code",
@@ -40,28 +40,12 @@
       "id": "3",
       "name": "freewrf",
       "date_created": "2025-06-27T04:34:58.998544Z",
-      "last_used": "2025-06-27T04:35:01.030654Z",
+      "last_used": "2025-06-27T05:21:07.273475Z",
       "apps": [
         {
           "app_name": "notepad",
           "open_command": "notepad",
           "path_or_url": ""
-        }
-      ]
-    },
-    {
-      "id": "4",
-      "name": "dddd",
-      "date_created": "2025-06-27T05:05:20.996626Z",
-      "last_used": "2025-06-27T05:05:27.318060Z",
-      "apps": [
-        {
-          "app_name": "Browser",
-          "open_command": "browser",
-          "path_or_url": [
-            "https://iwenjf.com",
-            "https://wferf,in"
-          ]
         }
       ]
     }

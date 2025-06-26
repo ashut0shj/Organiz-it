@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Code, Globe, Monitor, Plus, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import AddProfileModal from '../usablesubcomps/AddProfileModal';
 import Navbar from '../usablesubcomps/Navbar';
+import { useNotifications } from '@/hooks/use-notifications';
+import ConfirmationDialog from '@/components/ui/confirmation-dialog';
 import '../stylesheets/profiles.css';
 
 const ProfileLauncher = () => {
@@ -11,6 +13,10 @@ const ProfileLauncher = () => {
   const [error, setError] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [editingProfile, setEditingProfile] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [profileToDelete, setProfileToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const notifications = useNotifications();
 
   // Fetch profiles from backend
   useEffect(() => {
@@ -65,15 +71,15 @@ const ProfileLauncher = () => {
       console.log(data);
 
       if (data.status === "success") {
-        alert(`Profile "${profile.name}" launched successfully!`);
+        notifications.showSuccess("Profile Launched", `Profile "${profile.name}" launched successfully!`);
         // Refresh profiles to update last_used timestamp
         fetchProfiles();
       } else {
-        alert(`Error: ${data.message}`);
+        notifications.showError("Launch Failed", data.message);
       }
     } catch (error) {
       console.error("Error launching profile:", error);
-      alert("Failed to launch profile.");
+      notifications.showError("Launch Failed", "Failed to launch profile.");
     }
   };
 
@@ -129,37 +135,58 @@ const ProfileLauncher = () => {
       const data = await response.json();
       
       if (data.status === "success") {
+        notifications.showSuccess(
+          newProfile.id ? "Profile Updated" : "Profile Created", 
+          newProfile.id ? "Profile updated successfully!" : "Profile created successfully!"
+        );
         // Refresh profiles list
         fetchProfiles();
         setIsModalOpen(false);
         setEditingProfile(null);
       } else {
-        alert(`Error ${newProfile.id ? 'updating' : 'creating'} profile: ${data.message}`);
+        notifications.showError(
+          "Operation Failed", 
+          `Error ${newProfile.id ? 'updating' : 'creating'} profile: ${data.message}`
+        );
       }
     } catch (error) {
       console.error(`Error ${newProfile.id ? 'updating' : 'creating'} profile:`, error);
-      alert(`Failed to ${newProfile.id ? 'update' : 'create'} profile.`);
+      notifications.showError(
+        "Operation Failed", 
+        `Failed to ${newProfile.id ? 'update' : 'create'} profile.`
+      );
     }
   };
 
   const handleDeleteProfile = async (profileId, profileName) => {
-    if (window.confirm(`Are you sure you want to delete the profile "${profileName}"?`)) {
-      try {
-        const response = await fetch(`http://localhost:8000/profiles/${profileId}`, {
-          method: "DELETE",
-        });
+    setProfileToDelete({ id: profileId, name: profileName });
+    setDeleteDialogOpen(true);
+  };
 
-        if (response.ok) {
-          // Remove profile from local state
-          setProfiles(profiles.filter(profile => profile.id !== profileId));
-          setOpenMenuId(null);
-        } else {
-          alert("Failed to delete profile.");
-        }
-      } catch (error) {
-        console.error("Error deleting profile:", error);
-        alert("Failed to delete profile.");
+  const confirmDeleteProfile = async () => {
+    if (!profileToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`http://localhost:8000/profiles/${profileToDelete.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Remove profile from local state
+        setProfiles(profiles.filter(profile => profile.id !== profileToDelete.id));
+        setOpenMenuId(null);
+        notifications.showSuccess("Profile Deleted", `Profile "${profileToDelete.name}" deleted successfully!`);
+      } else {
+        notifications.showError("Delete Failed", "Failed to delete profile.");
       }
+    } catch (error) {
+      console.error("Error deleting profile:", error);
+      notifications.showError("Delete Failed", "Failed to delete profile.");
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+      setProfileToDelete(null);
     }
   };
 
@@ -320,6 +347,18 @@ const ProfileLauncher = () => {
           onClose={handleCloseModal}
           onAdd={handleAddProfile}
           editProfile={editingProfile}
+        />
+
+        <ConfirmationDialog
+          isOpen={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          onConfirm={confirmDeleteProfile}
+          title="Delete Workspace"
+          message={`Are you sure you want to delete "${profileToDelete?.name}"?   This action cannot be undone.`}
+          confirmText="Delete Workspace"
+          cancelText="Keep Workspace"
+          type="danger"
+          isLoading={isDeleting}
         />
       </div>
     </>
