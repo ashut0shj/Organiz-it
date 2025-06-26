@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Code, Globe, Monitor, Plus } from 'lucide-react';
+import { Code, Globe, Monitor, Plus, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import AddProfileModal from '../usablesubcomps/AddProfileModal';
 import Navbar from '../usablesubcomps/Navbar';
 import '../stylesheets/profiles.css';
@@ -9,6 +9,7 @@ const ProfileLauncher = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
 
   // Fetch profiles from backend
   useEffect(() => {
@@ -126,6 +127,46 @@ const ProfileLauncher = () => {
     }
   };
 
+  const handleDeleteProfile = async (profileId, profileName) => {
+    if (window.confirm(`Are you sure you want to delete the profile "${profileName}"?`)) {
+      try {
+        const response = await fetch(`http://localhost:8000/profiles/${profileId}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          // Remove profile from local state
+          setProfiles(profiles.filter(profile => profile.id !== profileId));
+          setOpenMenuId(null);
+        } else {
+          alert("Failed to delete profile.");
+        }
+      } catch (error) {
+        console.error("Error deleting profile:", error);
+        alert("Failed to delete profile.");
+      }
+    }
+  };
+
+  const handleEditProfile = (profile) => {
+    // TODO: Implement edit functionality
+    alert(`Edit functionality for "${profile.name}" will be implemented soon!`);
+    setOpenMenuId(null);
+  };
+
+  const toggleMenu = (profileId, event) => {
+    event.stopPropagation(); // Prevent profile launch
+    setOpenMenuId(openMenuId === profileId ? null : profileId);
+  };
+
+  const handleProfileClick = (profile, event) => {
+    // Don't launch if clicking on menu
+    if (event.target.closest('.profile-menu')) {
+      return;
+    }
+    handleProfileLaunch(profile);
+  };
+
   const totalApps = profiles.reduce((total, profile) => total + getAppCount(profile.apps), 0);
   const totalItems = profiles.reduce((total, profile) => total + getAppCount(profile.apps), 0);
 
@@ -182,8 +223,36 @@ const ProfileLauncher = () => {
         <div className="workspacer-content">
           <div className="profiles-grid">
             {profiles.map((profile, index) => (
-              <div key={profile.id} className="profile-card" onClick={() => handleProfileLaunch(profile)}>
-                <h3 className="profile-name">{profile.name}</h3>
+              <div key={profile.id} className="profile-card" onClick={(event) => handleProfileClick(profile, event)}>
+                <div className="profile-header">
+                  <h3 className="profile-name">{profile.name}</h3>
+                  <div className="profile-menu">
+                    <button 
+                      className="menu-trigger"
+                      onClick={(event) => toggleMenu(profile.id, event)}
+                    >
+                      <MoreVertical size={16} />
+                    </button>
+                    {openMenuId === profile.id && (
+                      <div className="menu-dropdown">
+                        <button 
+                          className="menu-item"
+                          onClick={() => handleEditProfile(profile)}
+                        >
+                          <Edit size={14} />
+                          Edit Profile
+                        </button>
+                        <button 
+                          className="menu-item delete"
+                          onClick={() => handleDeleteProfile(profile.id, profile.name)}
+                        >
+                          <Trash2 size={14} />
+                          Delete Profile
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
                 
                 <div className="app-badges">
                   {profile.apps && profile.apps.slice(0, 8).map((app, appIndex) => (

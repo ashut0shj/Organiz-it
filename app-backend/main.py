@@ -184,6 +184,24 @@ async def create_profile(profile_data: dict):
     
     return JSONResponse(content={"status": "success", "profile": new_profile})
 
+@app.delete("/profiles/{profile_id}")
+async def delete_profile(profile_id: str):
+    """Delete a profile by ID"""
+    profiles_data = load_profiles()
+    
+    # Find and remove the profile
+    original_length = len(profiles_data["profiles"])
+    profiles_data["profiles"] = [p for p in profiles_data["profiles"] if p["id"] != profile_id]
+    
+    if len(profiles_data["profiles"]) == original_length:
+        return JSONResponse(
+            content={"status": "error", "message": f"Profile with ID '{profile_id}' not found."},
+            status_code=404
+        )
+    
+    save_profiles(profiles_data)
+    return JSONResponse(content={"status": "success", "message": f"Profile deleted successfully."})
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
