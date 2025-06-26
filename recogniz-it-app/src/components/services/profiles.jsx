@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Code, Globe, Monitor, Plus } from 'lucide-react';
+import { Code, Globe, Monitor, Plus } from 'lucide-react';
 import AddProfileModal from '../usablesubcomps/AddProfileModal';
 import '../stylesheets/profiles.css';
 
@@ -34,11 +34,11 @@ const ProfileLauncher = () => {
   const getAppTypeIcon = (openCommand) => {
     switch (openCommand) {
       case 'browser':
-        return <Globe size={16} />;
+        return <Globe size={14} />;
       case 'code':
-        return <Code size={16} />;
+        return <Code size={14} />;
       default:
-        return <Monitor size={16} />;
+        return <Monitor size={14} />;
     }
   };
 
@@ -115,7 +115,7 @@ const ProfileLauncher = () => {
       if (data.status === "success") {
         // Refresh profiles list
         fetchProfiles();
-    setIsModalOpen(false);
+        setIsModalOpen(false);
       } else {
         alert(`Error creating profile: ${data.message}`);
       }
@@ -132,14 +132,16 @@ const ProfileLauncher = () => {
     return (
       <div className="workspacer-container">
         <div className="workspacer-content">
-          <div className="workspacer-header">
-            <div className="logo-container">
-              <div className="logo-icon">
-                <Monitor />
-              </div>
-              <h1 className="app-title">workspacer</h1>
+          <div className="profiles-grid">
+            <div style={{ 
+              gridColumn: '1 / -1', 
+              textAlign: 'center', 
+              color: '#94a3b8', 
+              fontSize: '18px',
+              padding: '40px' 
+            }}>
+              Loading profiles...
             </div>
-            <p className="app-subtitle">Loading profiles...</p>
           </div>
         </div>
       </div>
@@ -150,14 +152,16 @@ const ProfileLauncher = () => {
     return (
       <div className="workspacer-container">
         <div className="workspacer-content">
-          <div className="workspacer-header">
-            <div className="logo-container">
-              <div className="logo-icon">
-                <Monitor />
-              </div>
-              <h1 className="app-title">workspacer</h1>
+          <div className="profiles-grid">
+            <div style={{ 
+              gridColumn: '1 / -1', 
+              textAlign: 'center', 
+              color: '#f87171', 
+              fontSize: '18px',
+              padding: '40px' 
+            }}>
+              Error loading profiles: {error}
             </div>
-            <p className="app-subtitle">Error loading profiles: {error}</p>
           </div>
         </div>
       </div>
@@ -166,49 +170,28 @@ const ProfileLauncher = () => {
 
   return (
     <div className="workspacer-container">
-      <div className="background-decoration">
-        <div className="floating-shape shape-1"></div>
-        <div className="floating-shape shape-2"></div>
-        <div className="floating-shape shape-3"></div>
-      </div>
-
       <div className="workspacer-content">
-        <div className="workspacer-header">
-          <div className="logo-container">
-            <div className="logo-icon">
-              <Monitor />
-            </div>
-            <h1 className="app-title">workspacer</h1>
-          </div>
-          <p className="app-subtitle">Organize your workspace, simplify your workflow</p>
-        </div>
-
         <div className="profiles-grid">
           {profiles.map((profile, index) => (
-            <div key={profile.id} className={`profile-card gradient-${(index % 6) + 1}`} onClick={() => handleProfileLaunch(profile)}>
-              <div className="profile-card-header">
-                <h3 className="profile-name">{profile.name}</h3>
-                <div className="play-button">
-                  <Play size={16} />
-                </div>
-              </div>
-              
-              <div className="profile-info">
-                <span className="item-count">{getAppCount(profile.apps)} items</span>
-                {profile.last_used && (
-                  <span className="last-used">Last used: {new Date(profile.last_used).toLocaleDateString()}</span>
-                )}
-              </div>
+            <div key={profile.id} className="profile-card" onClick={() => handleProfileLaunch(profile)}>
+              <h3 className="profile-name">{profile.name}</h3>
               
               <div className="app-badges">
-                {profile.apps && profile.apps.slice(0, 3).map((app, appIndex) => (
-                  <span key={appIndex} className="app-badge">
+                {profile.apps && profile.apps.slice(0, 8).map((app, appIndex) => (
+                  <div key={appIndex} className="app-badge">
                     {getAppTypeIcon(app.open_command)}
-                    <span className="app-type">{app.app_name}</span>
-                  </span>
+                  </div>
                 ))}
-                {profile.apps && profile.apps.length > 3 && (
-                  <span className="more-count">+{profile.apps.length - 3}</span>
+                {profile.apps && profile.apps.length > 8 && (
+                  <div className="app-badge" style={{ 
+                    background: 'rgba(139, 92, 246, 0.3)',
+                    borderColor: 'rgba(139, 92, 246, 0.5)',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: '#ddd6fe'
+                  }}>
+                    +{profile.apps.length - 8}
+                  </div>
                 )}
               </div>
             </div>
@@ -217,7 +200,7 @@ const ProfileLauncher = () => {
           <div className="add-profile-card" onClick={() => setIsModalOpen(true)}>
             <div className="add-profile-content">
               <div className="add-profile-icon">
-                <Plus size={24} />
+                <Plus size={16} />
               </div>
               <span className="add-profile-text">Add Workspace</span>
             </div>

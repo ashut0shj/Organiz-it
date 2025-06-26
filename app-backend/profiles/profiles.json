@@ -36,16 +36,17 @@
         }
       ]
     },
+
     {
-      "id": "3",
-      "name": "hehe",
-      "date_created": "2025-06-23T03:49:43.157662Z",
-      "last_used": "2025-06-24T02:29:41.636426Z",
+      "id": "4",
+      "name": "try",
+      "date_created": "2025-06-27T03:41:38.365238Z",
+      "last_used": "2025-06-27T03:41:38.365251Z",
       "apps": [
         {
           "app_name": "Browser",
           "open_command": "browser",
-          "path_or_url": "https://www.google.com"
+          "path_or_url": "https://web.whatsapp.com/"
         }
       ]
     }
