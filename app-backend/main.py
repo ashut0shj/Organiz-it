@@ -28,11 +28,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-PROFILE_FOLDER = os.path.join(os.path.dirname(__file__), "profiles")
-PROFILES_JSON_PATH = os.path.join(PROFILE_FOLDER, "profiles.json")
+# Save profiles.json directly in the project directory (where main.py is)
+PROFILES_JSON_PATH = os.path.join(os.path.dirname(__file__), "profiles/profiles.json")
 LAST_PROFILE_PATH = os.path.join(os.path.dirname(__file__), "last_profile.txt")
-
-os.makedirs(PROFILE_FOLDER, exist_ok=True)
 
 # Initialize profiles.json if it doesn't exist
 if not os.path.exists(PROFILES_JSON_PATH):
