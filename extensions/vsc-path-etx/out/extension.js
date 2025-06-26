@@ -5,41 +5,59 @@ const vscode = require("vscode");
 const fs = require("fs");
 const path = require("path");
 function activate(context) {
-    const sharedDir = getSharedDirectoryPath();
-    const csvFilePath = path.join(sharedDir, 'vscode-activity-log.csv');
-    if (!fs.existsSync(sharedDir)) {
-        fs.mkdirSync(sharedDir, { recursive: true });
+    try {
+        // Log current workspace when extension activates
+        logWorkspace();
+        // Set up event listener for workspace folder changes
+        const workspaceFoldersChangeListener = vscode.workspace.onDidChangeWorkspaceFolders(() => {
+            logWorkspace();
+        });
+        context.subscriptions.push(workspaceFoldersChangeListener);
     }
-    if (!fs.existsSync(csvFilePath)) {
-        fs.writeFileSync(csvFilePath, 'Timestamp,Workspace Folders\n');
+    catch (error) {
+        console.error('Extension activation failed:', error);
     }
-    logCurrentWorkspaceFolders(csvFilePath);
-    const workspaceFoldersChangeListener = vscode.workspace.onDidChangeWorkspaceFolders(() => {
-        logCurrentWorkspaceFolders(csvFilePath);
-    });
-    context.subscriptions.push(workspaceFoldersChangeListener);
 }
 exports.activate = activate;
-function logCurrentWorkspaceFolders(csvFilePath) {
-    if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-        return;
+function logWorkspace() {
+    try {
+        // Skip if no workspace folders
+        if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
+            return;
+        }
+        const workspaceRoot = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        const historyFilePath = path.join(workspaceRoot, 'history.json');
+        // Check if we can write to the workspace directory
+        try {
+            fs.accessSync(workspaceRoot, fs.constants.W_OK);
+        }
+        catch (error) {
+            console.error('Cannot write to workspace directory:', workspaceRoot);
+            return;
+        }
+        // Create new entry
+        const newEntry = {
+            'vscode': workspaceRoot,
+            'date created': new Date().toISOString()
+        };
+        // Read existing history or create new array
+        let history = [];
+        if (fs.existsSync(historyFilePath)) {
+            try {
+                const existingData = fs.readFileSync(historyFilePath, 'utf8');
+                history = JSON.parse(existingData);
+            }
+            catch (error) {
+                history = [];
+            }
+        }
+        // Append new entry
+        history.push(newEntry);
+        // Write back to file
+        fs.writeFileSync(historyFilePath, JSON.stringify(history, null, 2));
     }
-    const timestamp = new Date().toISOString();
-    const workspaceFolders = vscode.workspace.workspaceFolders
-        .map(folder => folder.uri.fsPath)
-        .join(';');
-    const csvLine = `"${timestamp}","${workspaceFolders}"\n`;
-    fs.appendFileSync(csvFilePath, csvLine);
-}
-function getSharedDirectoryPath() {
-    if (process.platform === 'win32') {
-        return path.join('C:', 'Users', 'Public', 'Documents', 'VSCodeLogs');
-    }
-    else if (process.platform === 'darwin') {
-        return path.join('/Users', 'Shared', 'vscode-logs');
-    }
-    else {
-        return path.join('/home', 'shared', 'vscode-logs');
+    catch (error) {
+        console.error('Error in logWorkspace:', error);
     }
 }
 function deactivate() { }

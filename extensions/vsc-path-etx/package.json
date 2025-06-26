@@ -1,6 +1,7 @@
 {
   "name": "vsc-path-etx",
   "displayName": "VS Code Activity Tracker",
+  "publisher": "your-name-or-org",
   "description": "Tracks folder activity with timestamps",
   "version": "0.1.0",
   "engines": {
