@@ -120,7 +120,7 @@ async def auth_callback(request: Request):
             "name": user.get("name", ""),
             "picture": user.get("picture", "")
         })
-        redirect_url = f"http://localhost:5173/dashboard?{params}"
+        redirect_url = f"http://localhost:5173/profile?{params}"
         return RedirectResponse(url=redirect_url)
 
     except Exception as e:
