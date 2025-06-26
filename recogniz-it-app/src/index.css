@@ -5,25 +5,11 @@
   font-weight: 400;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* background-color: #242424; */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Light theme override */
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
 }
 
 /* Reset layout */
@@ -32,24 +18,32 @@ html, body, #root {
   width: 100%;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
 /* Basic body layout */
 body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   min-width: 320px;
+  min-height: 100vh;
+  width: 100vw;
   background: linear-gradient(to right, #6a11cb, #2575fc);
 }
 
-/* Anchor styles */
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: none;
+/* Basic button reset */
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
 }
+
+/* Basic link reset */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Anchor styles */
 a:hover {
   color: #535bf2;
 }
@@ -61,10 +55,8 @@ button {
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
-  font-family: inherit;
   background-color: #1a1a1a;
   color: white;
-  cursor: pointer;
   transition: border-color 0.25s, background-color 0.25s;
 }
 button:hover {

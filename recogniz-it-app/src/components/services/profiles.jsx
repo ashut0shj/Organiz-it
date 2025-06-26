@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Code, Globe, Monitor, Plus } from 'lucide-react';
 import AddProfileModal from '../usablesubcomps/AddProfileModal';
+import Navbar from '../usablesubcomps/Navbar';
 import '../stylesheets/profiles.css';
 
 const ProfileLauncher = () => {
@@ -130,105 +131,99 @@ const ProfileLauncher = () => {
 
   if (loading) {
     return (
-      <div className="workspacer-container">
-        <div className="workspacer-content">
-          <div className="profiles-grid">
-            <div style={{ 
-              gridColumn: '1 / -1', 
-              textAlign: 'center', 
-              color: '#94a3b8', 
-              fontSize: '18px',
-              padding: '40px' 
-            }}>
-              Loading profiles...
+      <>
+        <Navbar profiles={profiles} />
+        <div className="workspacer-container">
+          <div className="workspacer-content">
+            <div className="profiles-grid">
+              <div style={{ 
+                gridColumn: '1 / -1', 
+                textAlign: 'center', 
+                color: '#94a3b8', 
+                fontSize: '18px',
+                padding: '40px' 
+              }}>
+                Loading profiles...
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="workspacer-container">
-        <div className="workspacer-content">
-          <div className="profiles-grid">
-            <div style={{ 
-              gridColumn: '1 / -1', 
-              textAlign: 'center', 
-              color: '#f87171', 
-              fontSize: '18px',
-              padding: '40px' 
-            }}>
-              Error loading profiles: {error}
+      <>
+        <Navbar profiles={profiles} />
+        <div className="workspacer-container">
+          <div className="workspacer-content">
+            <div className="profiles-grid">
+              <div style={{ 
+                gridColumn: '1 / -1', 
+                textAlign: 'center', 
+                color: '#f87171', 
+                fontSize: '18px',
+                padding: '40px' 
+              }}>
+                Error loading profiles: {error}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="workspacer-container">
-      <div className="workspacer-content">
-        <div className="profiles-grid">
-          {profiles.map((profile, index) => (
-            <div key={profile.id} className="profile-card" onClick={() => handleProfileLaunch(profile)}>
-              <h3 className="profile-name">{profile.name}</h3>
-              
-              <div className="app-badges">
-                {profile.apps && profile.apps.slice(0, 8).map((app, appIndex) => (
-                  <div key={appIndex} className="app-badge">
-                    {getAppTypeIcon(app.open_command)}
-                  </div>
-                ))}
-                {profile.apps && profile.apps.length > 8 && (
-                  <div className="app-badge" style={{ 
-                    background: 'rgba(139, 92, 246, 0.3)',
-                    borderColor: 'rgba(139, 92, 246, 0.5)',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#ddd6fe'
-                  }}>
-                    +{profile.apps.length - 8}
-                  </div>
-                )}
+    <>
+      <Navbar profiles={profiles} />
+      <div className="workspacer-container">
+        <div className="workspacer-content">
+          <div className="profiles-grid">
+            {profiles.map((profile, index) => (
+              <div key={profile.id} className="profile-card" onClick={() => handleProfileLaunch(profile)}>
+                <h3 className="profile-name">{profile.name}</h3>
+                
+                <div className="app-badges">
+                  {profile.apps && profile.apps.slice(0, 8).map((app, appIndex) => (
+                    <div key={appIndex} className="app-badge">
+                      {getAppTypeIcon(app.open_command)}
+                    </div>
+                  ))}
+                  {profile.apps && profile.apps.length > 8 && (
+                    <div className="app-badge" style={{ 
+                      background: 'rgba(139, 92, 246, 0.3)',
+                      borderColor: 'rgba(139, 92, 246, 0.5)',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      color: '#ddd6fe'
+                    }}>
+                      +{profile.apps.length - 8}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-          
-          <div className="add-profile-card" onClick={() => setIsModalOpen(true)}>
-            <div className="add-profile-content">
-              <div className="add-profile-icon">
-                <Plus size={16} />
+            ))}
+            
+            <div className="add-profile-card" onClick={() => setIsModalOpen(true)}>
+              <div className="add-profile-content">
+                <div className="add-profile-icon">
+                  <Plus size={16} />
+                </div>
+                <span className="add-profile-text">Add Workspace</span>
               </div>
-              <span className="add-profile-text">Add Workspace</span>
             </div>
           </div>
         </div>
 
-        <div className="stats-container">
-          <div className="stat-item">
-            <div className="stat-number">{profiles.length}</div>
-            <div className="stat-label">Workspaces</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-number">{totalApps}</div>
-            <div className="stat-label">Apps</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-number">{totalItems}</div>
-            <div className="stat-label">Items</div>
-          </div>
-        </div>
+        <AddProfileModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onAdd={handleAddProfile}
+        />
       </div>
-
-      <AddProfileModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onAdd={handleAddProfile}
-      />
-    </div>
+    </>
   );
 };
 
