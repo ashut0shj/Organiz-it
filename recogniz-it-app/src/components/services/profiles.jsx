@@ -10,6 +10,7 @@ const ProfileLauncher = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [editingProfile, setEditingProfile] = useState(null);
 
   // Fetch profiles from backend
   useEffect(() => {
@@ -104,13 +105,26 @@ const ProfileLauncher = () => {
         })
       };
 
-      const response = await fetch("http://localhost:8000/profiles", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(backendProfile),
-      });
+      let response;
+      if (newProfile.id) {
+        // Update existing profile
+        response = await fetch(`http://localhost:8000/profiles/${newProfile.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(backendProfile),
+        });
+      } else {
+        // Create new profile
+        response = await fetch("http://localhost:8000/profiles", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(backendProfile),
+        });
+      }
 
       const data = await response.json();
       
@@ -118,12 +132,13 @@ const ProfileLauncher = () => {
         // Refresh profiles list
         fetchProfiles();
         setIsModalOpen(false);
+        setEditingProfile(null);
       } else {
-        alert(`Error creating profile: ${data.message}`);
+        alert(`Error ${newProfile.id ? 'updating' : 'creating'} profile: ${data.message}`);
       }
     } catch (error) {
-      console.error("Error creating profile:", error);
-      alert("Failed to create profile.");
+      console.error(`Error ${newProfile.id ? 'updating' : 'creating'} profile:`, error);
+      alert(`Failed to ${newProfile.id ? 'update' : 'create'} profile.`);
     }
   };
 
@@ -149,9 +164,22 @@ const ProfileLauncher = () => {
   };
 
   const handleEditProfile = (profile) => {
-    // TODO: Implement edit functionality
-    alert(`Edit functionality for "${profile.name}" will be implemented soon!`);
+    console.log('handleEditProfile called with profile:', profile);
+    setEditingProfile(profile);
+    setIsModalOpen(true);
     setOpenMenuId(null);
+  };
+
+  const handleCloseModal = () => {
+    console.log('handleCloseModal called');
+    setIsModalOpen(false);
+    setEditingProfile(null);
+  };
+
+  const handleAddNewWorkspace = () => {
+    console.log('handleAddNewWorkspace called');
+    setEditingProfile(null); // Clear any editing state
+    setIsModalOpen(true);
   };
 
   const toggleMenu = (profileId, event) => {
@@ -275,7 +303,7 @@ const ProfileLauncher = () => {
               </div>
             ))}
             
-            <div className="add-profile-card" onClick={() => setIsModalOpen(true)}>
+            <div className="add-profile-card" onClick={handleAddNewWorkspace}>
               <div className="add-profile-content">
                 <div className="add-profile-icon">
                   <Plus size={16} />
@@ -287,9 +315,11 @@ const ProfileLauncher = () => {
         </div>
 
         <AddProfileModal
+          key={editingProfile ? `edit-${editingProfile.id}` : 'add-new'}
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={handleCloseModal}
           onAdd={handleAddProfile}
+          editProfile={editingProfile}
         />
       </div>
     </>

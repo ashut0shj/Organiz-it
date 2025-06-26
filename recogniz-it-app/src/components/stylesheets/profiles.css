@@ -249,21 +249,25 @@
 }
 
 .menu-trigger {
-  background: none;
-  border: none;
-  color: #64748b;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 6px;
+  border-radius: 6px;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
 }
 
 .menu-trigger:hover {
-  background: rgba(99, 102, 241, 0.1);
-  color: #6366f1;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  transform: scale(1.05);
 }
 
 .menu-dropdown {

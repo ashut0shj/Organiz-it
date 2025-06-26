@@ -202,6 +202,35 @@ async def delete_profile(profile_id: str):
     save_profiles(profiles_data)
     return JSONResponse(content={"status": "success", "message": f"Profile deleted successfully."})
 
+@app.put("/profiles/{profile_id}")
+async def update_profile(profile_id: str, profile_data: dict):
+    """Update a profile by ID"""
+    profiles_data = load_profiles()
+    
+    # Find the profile to update
+    profile_found = False
+    for i, profile in enumerate(profiles_data["profiles"]):
+        if profile["id"] == profile_id:
+            # Update the profile data
+            profiles_data["profiles"][i] = {
+                "id": profile_id,
+                "name": profile_data["name"],
+                "date_created": profile["date_created"],  # Keep original creation date
+                "last_used": datetime.now().isoformat() + "Z",
+                "apps": profile_data.get("apps", [])
+            }
+            profile_found = True
+            break
+    
+    if not profile_found:
+        return JSONResponse(
+            content={"status": "error", "message": f"Profile with ID '{profile_id}' not found."},
+            status_code=404
+        )
+    
+    save_profiles(profiles_data)
+    return JSONResponse(content={"status": "success", "message": f"Profile updated successfully."})
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

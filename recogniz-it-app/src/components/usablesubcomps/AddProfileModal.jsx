@@ -1,11 +1,45 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Code, Globe, Monitor } from 'lucide-react';
 import './AddProfileModal.css';
 
-const AddProfileModal = ({ isOpen, onClose, onAdd }) => {
+const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
   const [profileName, setProfileName] = useState('');
   const [apps, setApps] = useState([]);
+
+  // Convert backend app format to frontend format
+  const convertBackendToFrontend = (backendApps) => {
+    return backendApps.map(app => {
+      if (app.open_command === 'browser') {
+        return {
+          type: 'browser',
+          urls: [app.path_or_url]
+        };
+      } else if (app.open_command === 'code') {
+        return {
+          type: 'code',
+          path: app.path_or_url
+        };
+      } else {
+        return {
+          type: 'app',
+          command: app.open_command
+        };
+      }
+    });
+  };
+
+  // Load edit data when modal opens or editProfile changes
+  useEffect(() => {
+    console.log('AddProfileModal useEffect - isOpen:', isOpen, 'editProfile:', editProfile);
+    if (isOpen && editProfile) {
+      console.log('Loading edit data for profile:', editProfile.name);
+      setProfileName(editProfile.name);
+      setApps(convertBackendToFrontend(editProfile.apps || []));
+    } else if (isOpen && !editProfile) {
+      console.log('Resetting form - no edit profile');
+      resetForm();
+    }
+  }, [isOpen, editProfile]);
 
   const resetForm = () => {
     setProfileName('');
@@ -22,7 +56,8 @@ const AddProfileModal = ({ isOpen, onClose, onAdd }) => {
     if (profileName.trim() && apps.length > 0) {
       onAdd({
         name: profileName.trim(),
-        apps: apps
+        apps: apps,
+        id: editProfile?.id // Pass the ID if editing
       });
       resetForm();
     }
@@ -88,7 +123,9 @@ const AddProfileModal = ({ isOpen, onClose, onAdd }) => {
     <div className="modal-overlay">
       <div className="modal-container">
         <div className="modal-header">
-          <h2 className="modal-title">Add New Workspace</h2>
+          <h2 className="modal-title">
+            {editProfile ? 'Edit Workspace' : 'Add New Workspace'}
+          </h2>
           <button
             onClick={handleClose}
             className="close-button"
@@ -217,7 +254,7 @@ const AddProfileModal = ({ isOpen, onClose, onAdd }) => {
               className="submit-button"
               disabled={!profileName.trim() || apps.length === 0}
             >
-              Add Workspace
+              {editProfile ? 'Update Workspace' : 'Add Workspace'}
             </button>
           </div>
         </form>

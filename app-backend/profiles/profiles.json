@@ -4,7 +4,7 @@
       "id": "1",
       "name": "Frontend Dev",
       "date_created": "2024-06-01T10:00:00Z",
-      "last_used": "2025-06-27T03:08:45.663241Z",
+      "last_used": "2025-06-27T04:43:14.492424Z",
       "apps": [
         {
           "app_name": "VS Code",
@@ -22,17 +22,30 @@
       "id": "2",
       "name": "Study",
       "date_created": "2024-06-02T12:00:00Z",
-      "last_used": "2024-06-11T08:00:00Z",
+      "last_used": "2025-06-27T04:43:41.284794Z",
       "apps": [
         {
-          "app_name": "Notion",
+          "app_name": "Browser",
           "open_command": "browser",
           "path_or_url": "https://notion.so/your-study-notes"
         },
         {
-          "app_name": "PDF Reader",
-          "open_command": "evince",
-          "path_or_url": "/home/user/Documents/notes.pdf"
+          "app_name": "VS Code",
+          "open_command": "code",
+          "path_or_url": "/home/ashut0sh/projects/Organiz-it/"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "freewrf",
+      "date_created": "2025-06-27T04:34:58.998544Z",
+      "last_used": "2025-06-27T04:35:01.030654Z",
+      "apps": [
+        {
+          "app_name": "notepad",
+          "open_command": "notepad",
+          "path_or_url": ""
         }
       ]
     }
