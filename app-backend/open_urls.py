@@ -21,7 +21,15 @@ def open_apps(apps):
         path_or_url = app.get("path_or_url")
         try:
             if open_command == "browser":
-                webbrowser.open(path_or_url)
+                # Handle multiple URLs for browser apps
+                if isinstance(path_or_url, list):
+                    # If path_or_url is a list, open each URL
+                    for url in path_or_url:
+                        if url.strip():  # Only open non-empty URLs
+                            webbrowser.open(url)
+                else:
+                    # If path_or_url is a single string, open it
+                    webbrowser.open(path_or_url)
             elif open_command == "code":
                 if os_type == 'windows':
                     subprocess.Popen(["code.cmd", path_or_url])

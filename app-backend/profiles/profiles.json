@@ -4,7 +4,7 @@
       "id": "1",
       "name": "Frontend Dev",
       "date_created": "2024-06-01T10:00:00Z",
-      "last_used": "2025-06-27T04:43:14.492424Z",
+      "last_used": "2025-06-27T05:02:03.793313Z",
       "apps": [
         {
           "app_name": "VS Code",
@@ -12,7 +12,7 @@
           "path_or_url": "/home/user/projects/frontend"
         },
         {
-          "app_name": "ChatGPT",
+          "app_name": "Browser",
           "open_command": "browser",
           "path_or_url": "https://chatgpt.com/c/683bff53-ef70-8013-b02b-babe5136ee3d"
         }
@@ -46,6 +46,22 @@
           "app_name": "notepad",
           "open_command": "notepad",
           "path_or_url": ""
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "dddd",
+      "date_created": "2025-06-27T05:05:20.996626Z",
+      "last_used": "2025-06-27T05:05:27.318060Z",
+      "apps": [
+        {
+          "app_name": "Browser",
+          "open_command": "browser",
+          "path_or_url": [
+            "https://iwenjf.com",
+            "https://wferf,in"
+          ]
         }
       ]
     }

@@ -87,7 +87,7 @@ const ProfileLauncher = () => {
             return {
               app_name: 'Browser',
               open_command: 'browser',
-              path_or_url: app.urls[0] // Take first URL for now
+              path_or_url: app.urls.filter(url => url.trim()) // Send all non-empty URLs
             };
           } else if (app.type === 'code') {
             return {

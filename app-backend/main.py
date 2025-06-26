@@ -85,8 +85,15 @@ def open_profile_apps(profile_id):
                 
                 try:
                     if open_command == "browser":
-                        # Open URL in browser
-                        webbrowser.open(path_or_url)
+                        # Handle multiple URLs for browser apps
+                        if isinstance(path_or_url, list):
+                            # If path_or_url is a list, open each URL
+                            for url in path_or_url:
+                                if url.strip():  # Only open non-empty URLs
+                                    webbrowser.open(url)
+                        else:
+                            # If path_or_url is a single string, open it
+                            webbrowser.open(path_or_url)
                     elif open_command == "code":
                         # Open VS Code with path
                         subprocess.Popen(["code", path_or_url])

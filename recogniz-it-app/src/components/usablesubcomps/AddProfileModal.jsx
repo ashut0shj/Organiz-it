@@ -10,9 +10,11 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
   const convertBackendToFrontend = (backendApps) => {
     return backendApps.map(app => {
       if (app.open_command === 'browser') {
+        // Handle both single URL (string) and multiple URLs (array)
+        const urls = Array.isArray(app.path_or_url) ? app.path_or_url : [app.path_or_url];
         return {
           type: 'browser',
-          urls: [app.path_or_url]
+          urls: urls.filter(url => url && url.trim()) // Filter out empty URLs
         };
       } else if (app.open_command === 'code') {
         return {
