@@ -9,6 +9,9 @@ const Navbar = ({ profiles }) => {
   return (
     <nav className="navbar">
       <div className="navbar-left">
+        <div className="navbar-logo">
+          <img src="/vite.svg" alt="Organiz-it Logo" className="logo-image" />
+        </div>
         <span className="navbar-title">workspacer</span>
       </div>
       <div className="navbar-right">
