@@ -96,7 +96,7 @@ def open_profile_apps(profile_id):
                             webbrowser.open(path_or_url)
                     elif open_command == "code":
                         # Open VS Code with path
-                        subprocess.Popen(["code", path_or_url])
+                        subprocess.Popen(f'code "{path_or_url}"', shell=True)
                     else:
                         # Try to open with the specified command
                         subprocess.Popen([open_command, path_or_url])

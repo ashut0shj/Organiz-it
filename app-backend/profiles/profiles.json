@@ -22,17 +22,19 @@
       "id": "2",
       "name": "Study",
       "date_created": "2024-06-02T12:00:00Z",
-      "last_used": "2025-06-27T04:43:41.284794Z",
+      "last_used": "2025-06-27T11:45:10.184671Z",
       "apps": [
         {
           "app_name": "Browser",
           "open_command": "browser",
-          "path_or_url": "https://notion.so/your-study-notes"
+          "path_or_url": [
+            "https://notion.so/your-study-notes"
+          ]
         },
         {
           "app_name": "VS Code",
           "open_command": "code",
-          "path_or_url": "/home/ashut0sh/projects/Organiz-it/"
+          "path_or_url": "C:\\Users\\Shaurya Malhan\\Desktop\\Organiz-it"
         }
       ]
     },
@@ -40,7 +42,7 @@
       "id": "3",
       "name": "freewrf",
       "date_created": "2025-06-27T04:34:58.998544Z",
-      "last_used": "2025-06-27T05:21:07.273475Z",
+      "last_used": "2025-06-27T11:30:05.250224Z",
       "apps": [
         {
           "app_name": "notepad",
