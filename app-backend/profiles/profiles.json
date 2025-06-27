@@ -15,6 +15,16 @@
           "app_name": "Browser",
           "open_command": "browser",
           "path_or_url": "https://chatgpt.com/c/683bff53-ef70-8013-b02b-babe5136ee3d"
+        },
+        {
+          "app_name": "Browser",
+          "open_command": "browser",
+          "path_or_url": "https://codeforces.com/problemset?tags=1400-1400"
+        },
+        {
+          "app_name": "Browser",
+          "open_command": "browser",
+          "path_or_url": "https://leetcode.com/"
         }
       ]
     },
@@ -35,6 +45,11 @@
           "app_name": "VS Code",
           "open_command": "code",
           "path_or_url": "C:\\Users\\Shaurya Malhan\\Desktop\\Organiz-it"
+        },
+        {
+          "app_name": "Browser",
+          "open_command": "browser",
+          "path_or_url": "https://codeforces.com/problemset?tags=1400-1400"
         }
       ]
     },

@@ -238,6 +238,38 @@ async def update_profile(profile_id: str, profile_data: dict):
     save_profiles(profiles_data)
     return JSONResponse(content={"status": "success", "message": f"Profile updated successfully."})
 
+
+PROFILE_PATH = os.path.join("profiles", "profiles.json")
+
+@app.get("/profilenames")
+def get_profiles():
+    with open(PROFILE_PATH, "r") as f:
+        return json.load(f)
+
+@app.post("/track")
+async def track(request: Request):
+    data = await request.json()
+    profile_name = data["profile"]
+    url = data["url"]
+        
+    with open(PROFILE_PATH, "r") as f:
+        profiles_data = json.load(f)
+
+    for profile in profiles_data["profiles"]:
+        if profile["name"] == profile_name:
+            # Append the URL as a new browser app
+            profile["apps"].append({
+                "app_name": "Browser",
+                "open_command": "browser",
+                "path_or_url": url
+            })
+            break
+
+    with open(PROFILE_PATH, "w") as f:
+        json.dump(profiles_data, f, indent=2)
+
+    return {"status": "added"}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
