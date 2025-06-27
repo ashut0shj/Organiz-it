@@ -25,6 +25,16 @@
           "app_name": "Browser",
           "open_command": "browser",
           "path_or_url": "https://leetcode.com/"
+        },
+        {
+          "app_name": "Browser",
+          "open_command": "browser",
+          "path_or_url": "https://chatgpt.com/c/685f12aa-6734-8013-9de1-06ec33373cab"
+        },
+        {
+          "app_name": "Browser",
+          "open_command": "browser",
+          "path_or_url": "https://chatgpt.com/c/685f12aa-6734-8013-9de1-06ec33373cab"
         }
       ]
     },
@@ -63,6 +73,11 @@
           "app_name": "notepad",
           "open_command": "notepad",
           "path_or_url": ""
+        },
+        {
+          "app_name": "Browser",
+          "open_command": "browser",
+          "path_or_url": "chrome://extensions/"
         }
       ]
     }
