@@ -30,8 +30,7 @@ app.add_middleware(
 )
 
 # Save profiles.json directly in the project directory (where main.py is)
-PROFILES_JSON_PATH = os.path.join(os.path.dirname(__file__), "profiles/profiles.json")
-LAST_PROFILE_PATH = os.path.join(os.path.dirname(__file__), "last_profile.txt")
+PROFILES_JSON_PATH = os.getenv("PROFILES_JSON_PATH") or os.path.join(os.path.dirname(__file__), "profiles/profiles.json")
 
 # Initialize profiles.json if it doesn't exist
 if not os.path.exists(PROFILES_JSON_PATH):
@@ -160,10 +159,6 @@ async def launch_profile(req: ProfileRequest):
             status_code=404
         )
 
-    # Save the last profile name
-    with open(LAST_PROFILE_PATH, "w") as f:
-        f.write(profile_name)
-
     try:
         # Open all apps for the profile
         open_profile_apps(profile_id)
@@ -239,12 +234,9 @@ async def update_profile(profile_id: str, profile_data: dict):
     save_profiles(profiles_data)
     return JSONResponse(content={"status": "success", "message": f"Profile updated successfully."})
 
-
-PROFILE_PATH = os.path.join("profiles", "profiles.json")
-
 @app.get("/profilenames")
 def get_profiles():
-    with open(PROFILE_PATH, "r") as f:
+    with open(PROFILES_JSON_PATH, "r") as f:
         return json.load(f)
 
 @app.post("/track")
@@ -253,7 +245,7 @@ async def track(request: Request):
     profile_name = data["profile"]
     url = data["url"]
         
-    with open(PROFILE_PATH, "r") as f:
+    with open(PROFILES_JSON_PATH, "r") as f:
         profiles_data = json.load(f)
 
     for profile in profiles_data["profiles"]:
@@ -266,7 +258,7 @@ async def track(request: Request):
             })
             break
 
-    with open(PROFILE_PATH, "w") as f:
+    with open(PROFILES_JSON_PATH, "w") as f:
         json.dump(profiles_data, f, indent=2)
 
     return {"status": "added"}
