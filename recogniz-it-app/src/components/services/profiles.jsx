@@ -89,6 +89,7 @@ const ProfileLauncher = () => {
       const backendProfile = {
         name: newProfile.name,
         color: newProfile.color,
+        emoji: newProfile.emoji,
         apps: newProfile.apps.map(app => {
           if (app.type === 'browser') {
             return {
@@ -279,67 +280,137 @@ const ProfileLauncher = () => {
         <div className="workspacer-content">
           <div className="profiles-grid">
             {profiles.map((profile, index) => (
-              <div key={profile.id} className="profile-card" onClick={(event) => handleProfileClick(profile, event)} style={{ background: profile.color || '#6a49ff' }}>
-                <div className="profile-header">
-                  <h3 className="profile-name">{profile.name}</h3>
-                  <div className="profile-menu">
-                    <button 
-                      className="menu-trigger"
-                      onClick={(event) => toggleMenu(profile.id, event)}
-                    >
-                      <MoreVertical size={16} />
-                    </button>
-                    {openMenuId === profile.id && (
-                      <div className="menu-dropdown">
-                        <button 
-                          className="menu-item"
-                          onClick={() => handleEditProfile(profile)}
-                        >
-                          <Edit size={14} />
-                          Edit Profile
-                        </button>
-                        <button 
-                          className="menu-item delete"
-                          onClick={() => handleDeleteProfile(profile.id, profile.name)}
-                        >
-                          <Trash2 size={14} />
-                          Delete Profile
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="app-badges">
-                  {(() => {
-                    const shownTypes = new Set();
-                    const uniqueApps = [];
-                    if (profile.apps) {
-                      for (let i = 0; i < profile.apps.length; i++) {
-                        const app = profile.apps[i];
-                        const type = app.open_command;
-                        if (!shownTypes.has(type)) {
-                          shownTypes.add(type);
-                          uniqueApps.push(app);
-                        }
-                        if (uniqueApps.length === 8) break;
-                      }
-                    }
-                    return uniqueApps.map((app, appIndex) => (
-                      <div key={appIndex} className="app-badge">
-                        {getAppTypeIcon(app.open_command)}
-                      </div>
-                    ));
-                  })()}
-                  {profile.apps && new Set(profile.apps.map(app => app.open_command)).size > 8 && (
-                    <div className="app-badge" style={{ 
-                      background: 'rgba(139, 92, 246, 0.3)',
-                      borderColor: 'rgba(139, 92, 246, 0.5)',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      color: '#ddd6fe'
+              <div
+                key={profile.id}
+                className="profile-card"
+                onClick={(event) => handleProfileClick(profile, event)}
+                style={{
+                  background: profile.color || '#6a49ff',
+                  position: 'relative',
+                  width: 160,
+                  height: 160,
+                  borderRadius: 18,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  boxShadow: '0 2px 12px rgba(106,73,255,0.08)',
+                  cursor: 'pointer',
+                  padding: 0,
+                  margin: 0,
+                  overflow: 'hidden',
+                  transition: 'box-shadow 0.18s',
+                }}
+              >
+                {profile.emoji ? (
+                  <>
+                    <div style={{
+                      width: '100%',
+                      textAlign: 'center',
+                      fontWeight: 600,
+                      fontSize: 16,
+                      color: '#fff',
+                      padding: '14px 0 0 0',
+                      letterSpacing: 0.2,
+                      textShadow: '0 1px 4px rgba(0,0,0,0.10)'
+                    }}>{profile.name}</div>
+                    <div style={{
+                      flex: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '100%',
                     }}>
-                      +{new Set(profile.apps.map(app => app.open_command)).size - 8}
+                      <span style={{
+                        fontSize: '3.2rem',
+                        lineHeight: 1,
+                        userSelect: 'none',
+                        filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.10))',
+                      }}>{profile.emoji}</span>
+                    </div>
+                    <div style={{
+                      width: '100%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      gap: 6,
+                      padding: '0 0 12px 0',
+                    }}>
+                      {(() => {
+                        const shownTypes = new Set();
+                        const uniqueApps = [];
+                        if (profile.apps) {
+                          for (let i = 0; i < profile.apps.length; i++) {
+                            const app = profile.apps[i];
+                            const type = app.open_command;
+                            if (!shownTypes.has(type)) {
+                              shownTypes.add(type);
+                              uniqueApps.push(app);
+                            }
+                            if (uniqueApps.length === 6) break;
+                          }
+                        }
+                        return uniqueApps.map((app, appIndex) => (
+                          <div key={appIndex} style={{
+                            width: 22,
+                            height: 22,
+                            background: 'rgba(255,255,255,0.13)',
+                            borderRadius: 6,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: '1.5px solid rgba(255,255,255,0.18)',
+                            margin: 0,
+                            padding: 0,
+                          }}>
+                            {getAppTypeIcon(app.open_command)}
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </>
+                ) : (
+                  <div style={{
+                    flex: 1,
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <span style={{
+                      fontWeight: 800,
+                      fontSize: 26,
+                      color: '#fff',
+                      textAlign: 'center',
+                      letterSpacing: 0.3,
+                      textShadow: '0 2px 8px rgba(0,0,0,0.13)'
+                    }}>{profile.name}</span>
+                  </div>
+                )}
+                {/* Profile menu button (edit/delete) remains top right, absolute */}
+                <div className="profile-menu" style={{ position: 'absolute', top: 10, right: 10, zIndex: 2 }}>
+                  <button 
+                    className="menu-trigger"
+                    onClick={(event) => toggleMenu(profile.id, event)}
+                  >
+                    <MoreVertical size={16} />
+                  </button>
+                  {openMenuId === profile.id && (
+                    <div className="menu-dropdown">
+                      <button 
+                        className="menu-item"
+                        onClick={() => handleEditProfile(profile)}
+                      >
+                        <Edit size={14} />
+                        Edit Profile
+                      </button>
+                      <button 
+                        className="menu-item delete"
+                        onClick={() => handleDeleteProfile(profile.id, profile.name)}
+                      >
+                        <Trash2 size={14} />
+                        Delete Profile
+                      </button>
                     </div>
                   )}
                 </div>

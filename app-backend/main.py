@@ -176,6 +176,7 @@ async def create_profile(profile_data: dict):
         "id": new_id,
         "name": profile_data["name"],
         "color": profile_data.get("color", "#6a49ff"),
+        "emoji": profile_data.get("emoji", ""),
         "date_created": datetime.now().isoformat() + "Z",
         "last_used": datetime.now().isoformat() + "Z",
         "apps": profile_data.get("apps", [])
@@ -215,6 +216,7 @@ async def update_profile(profile_id: str, profile_data: dict):
                 "id": profile_id,
                 "name": profile_data["name"],
                 "color": profile_data.get("color", profile.get("color", "#6a49ff")),
+                "emoji": profile_data.get("emoji", profile.get("emoji", "")),
                 "date_created": profile["date_created"],  # Keep original creation date
                 "last_used": datetime.now().isoformat() + "Z",
                 "apps": profile_data.get("apps", [])

@@ -1,11 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Code, Globe, Monitor } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Plus, Trash2, Code, Globe, Monitor, Smile } from 'lucide-react';
 import './AddProfileModal.css';
 
 const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
   const [profileName, setProfileName] = useState('');
   const [apps, setApps] = useState([]);
   const [profileColor, setProfileColor] = useState('#6a49ff'); // Default color
+  const [profileEmoji, setProfileEmoji] = useState('');
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
+  const emojiList = [
+    '😀','😁','😂','🤣','😃','😄','😅','😆','😉','😊','😋','😎',
+    '😍','😘','🥰','😗','😙','😚','🙂','🤗','🤩','🤔','🤨','😐',
+    '😑','😶','🙄','😏','😣','😥','😮','🤐','😯','😪','😫','🥱',
+    '😴','😌','😛','😜','😝','🤤','😒','😓','😔','��','🙃','🤑'
+  ];
+
+  const emojiPickerRef = useRef(null);
+
+  // Close emoji picker on outside click or Escape
+  useEffect(() => {
+    if (!emojiPickerOpen) return;
+    function handleClick(e) {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target)) {
+        setEmojiPickerOpen(false);
+      }
+    }
+    function handleEscape(e) {
+      if (e.key === 'Escape') setEmojiPickerOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [emojiPickerOpen]);
 
   // Convert backend app format to frontend format
   const convertBackendToFrontend = (backendApps) => {
@@ -39,6 +68,7 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
       setProfileName(editProfile.name);
       setApps(convertBackendToFrontend(editProfile.apps || []));
       setProfileColor(editProfile.color || '#6a49ff');
+      setProfileEmoji(editProfile.emoji || '');
     } else if (isOpen && !editProfile) {
       console.log('Resetting form - no edit profile');
       resetForm();
@@ -49,6 +79,7 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
     setProfileName('');
     setApps([]);
     setProfileColor('#6a49ff');
+    setProfileEmoji('');
   };
 
   const handleClose = () => {
@@ -63,6 +94,7 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
         name: profileName.trim(),
         apps: apps,
         color: profileColor,
+        emoji: profileEmoji,
         id: editProfile?.id // Pass the ID if editing
       });
       resetForm();
@@ -141,8 +173,8 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          <div className="form-group">
-            <label className="form-label">Workspace Name</label>
+          <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <label className="form-label" style={{ flexShrink: 0 }}>Workspace Name</label>
             <input
               type="text"
               value={profileName}
@@ -150,7 +182,45 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
               className="form-input"
               placeholder="Enter workspace name"
               required
+              style={{ flex: 1 }}
             />
+            <button
+              type="button"
+              onClick={() => setEmojiPickerOpen(v => !v)}
+              className={`emoji-button ${profileEmoji ? 'has-emoji' : ''}`}
+              aria-label={profileEmoji ? `Selected emoji: ${profileEmoji}` : "Pick emoji"}
+              style={{ color: profileEmoji ? undefined : '#9ca3af' }}
+            >
+              {profileEmoji ? profileEmoji : <Smile size={22} color="inherit" />}
+            </button>
+            {emojiPickerOpen && (
+              <div
+                ref={emojiPickerRef}
+                className="emoji-picker-menu"
+              >
+                {emojiList.map((emoji, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => { setProfileEmoji(emoji); setEmojiPickerOpen(false); }}
+                    className="emoji-btn"
+                    aria-label={`Select emoji ${emoji}`}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            )}
+            {profileEmoji && (
+              <button
+                type="button"
+                onClick={() => setProfileEmoji('')}
+                className="emoji-clear-button"
+                aria-label="Clear emoji"
+              >
+                ×
+              </button>
+            )}
           </div>
 
           <div className="form-group">
