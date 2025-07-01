@@ -310,12 +310,27 @@ const ProfileLauncher = () => {
                 </div>
                 
                 <div className="app-badges">
-                  {profile.apps && profile.apps.slice(0, 8).map((app, appIndex) => (
-                    <div key={appIndex} className="app-badge">
-                      {getAppTypeIcon(app.open_command)}
-                    </div>
-                  ))}
-                  {profile.apps && profile.apps.length > 8 && (
+                  {(() => {
+                    const shownTypes = new Set();
+                    const uniqueApps = [];
+                    if (profile.apps) {
+                      for (let i = 0; i < profile.apps.length; i++) {
+                        const app = profile.apps[i];
+                        const type = app.open_command;
+                        if (!shownTypes.has(type)) {
+                          shownTypes.add(type);
+                          uniqueApps.push(app);
+                        }
+                        if (uniqueApps.length === 8) break;
+                      }
+                    }
+                    return uniqueApps.map((app, appIndex) => (
+                      <div key={appIndex} className="app-badge">
+                        {getAppTypeIcon(app.open_command)}
+                      </div>
+                    ));
+                  })()}
+                  {profile.apps && new Set(profile.apps.map(app => app.open_command)).size > 8 && (
                     <div className="app-badge" style={{ 
                       background: 'rgba(139, 92, 246, 0.3)',
                       borderColor: 'rgba(139, 92, 246, 0.5)',
@@ -323,7 +338,7 @@ const ProfileLauncher = () => {
                       fontWeight: '600',
                       color: '#ddd6fe'
                     }}>
-                      +{profile.apps.length - 8}
+                      +{new Set(profile.apps.map(app => app.open_command)).size - 8}
                     </div>
                   )}
                 </div>
