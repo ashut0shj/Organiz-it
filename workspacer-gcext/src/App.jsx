@@ -5,6 +5,8 @@ function App() {
   const [profiles, setProfiles] = useState([])
   const [loading, setLoading] = useState(true)
   const [isDarkTheme, setIsDarkTheme] = useState(false)
+  const [confirmingProfile, setConfirmingProfile] = useState(null)
+  const [containerConfirming, setContainerConfirming] = useState(false)
 
   useEffect(() => {
     fetch('http://127.0.0.1:8000/profilenames')
@@ -16,7 +18,11 @@ function App() {
       .finally(() => setLoading(false))
   }, [])
 
-  const sendProfile = (name) => {
+  const sendProfile = (name, profileId) => {
+    // Start confirmation animation
+    setConfirmingProfile(profileId)
+    setContainerConfirming(true)
+    
     if (typeof chrome !== 'undefined' && chrome.tabs) {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const currentUrl = tabs[0].url
@@ -25,12 +31,20 @@ function App() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ profile: name, url: currentUrl })
         }).finally(() => {
-          if (window.close) window.close();
+          // Keep animation visible for a moment before closing
+          setTimeout(() => {
+            if (window.close) window.close();
+          }, 400);
         });
       })
     } else {
       // Fallback for development
       console.log('Selected workspace:', name)
+      // Reset confirmation state after animation
+      setTimeout(() => {
+        setConfirmingProfile(null)
+        setContainerConfirming(false)
+      }, 600);
     }
   }
 
@@ -58,7 +72,7 @@ function App() {
   }
 
   return (
-    <div className={`extension-container ${isDarkTheme ? 'dark' : ''}`}>
+    <div className={`extension-container ${isDarkTheme ? 'dark' : ''} ${containerConfirming ? 'confirming' : ''}`}>
       <div className="header">
         <div className="header-content">
           <div>
@@ -80,8 +94,9 @@ function App() {
           profiles.map((p) => (
             <button 
               key={p.id} 
-              onClick={() => sendProfile(p.name)} 
-              className="profile-button"
+              onClick={() => sendProfile(p.name, p.id)} 
+              className={`profile-button ${confirmingProfile === p.id ? 'confirming' : ''}`}
+              disabled={confirmingProfile !== null}
             >
               <span className="profile-name">{p.name}</span>
               <span className="profile-arrow">→</span>

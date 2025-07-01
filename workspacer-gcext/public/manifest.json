@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Workspace Launcher",
+  "version": "1.0",
+  "description": "Select workspace and send current URL",
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon100.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon100.png"
+  },
+  "permissions": ["tabs", "activeTab"],
+  "host_permissions": ["<all_urls>"]
+} 

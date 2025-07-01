@@ -4,7 +4,7 @@
       "id": "1",
       "name": "Frontend Dev",
       "date_created": "2024-06-01T10:00:00Z",
-      "last_used": "2025-06-27T05:09:33.530300Z",
+      "last_used": "2025-07-01T17:19:26.272492Z",
       "apps": [
         {
           "app_name": "VS Code",
@@ -35,6 +35,11 @@
           "app_name": "Browser",
           "open_command": "browser",
           "path_or_url": "https://chatgpt.com/c/685f12aa-6734-8013-9de1-06ec33373cab"
+        },
+        {
+          "app_name": "Browser",
+          "open_command": "browser",
+          "path_or_url": "https://claude.ai/chat/c164960e-4a7b-4f3b-93b3-f82af4440120"
         }
       ]
     },
@@ -60,6 +65,11 @@
           "app_name": "Browser",
           "open_command": "browser",
           "path_or_url": "https://codeforces.com/problemset?tags=1400-1400"
+        },
+        {
+          "app_name": "Browser",
+          "open_command": "browser",
+          "path_or_url": "http://localhost:5173/profile?email=ashutoshj2810%40gmail.com&name=Ashutosh+Jaiswal&picture=https%3A%2F%2Flh3.googleusercontent.com%2Fa%2FACg8ocL4Wr9ILyJ3NiPknHqf4KIT1nDJEGvgr50ypF9hrbG8mk86yDo%3Ds96-c"
         }
       ]
     },
@@ -78,6 +88,29 @@
           "app_name": "Browser",
           "open_command": "browser",
           "path_or_url": "chrome://extensions/"
+        },
+        {
+          "app_name": "Browser",
+          "open_command": "browser",
+          "path_or_url": "chrome://extensions/"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "hehe",
+      "date_created": "2025-07-02T02:06:04.440733Z",
+      "last_used": "2025-07-02T02:06:16.995625Z",
+      "apps": [
+        {
+          "app_name": "Browser",
+          "open_command": "browser",
+          "path_or_url": []
+        },
+        {
+          "app_name": "Browser",
+          "open_command": "browser",
+          "path_or_url": "http://localhost:5173/profile?email=ashutoshj2810%40gmail.com&name=Ashutosh+Jaiswal&picture=https%3A%2F%2Flh3.googleusercontent.com%2Fa%2FACg8ocL4Wr9ILyJ3NiPknHqf4KIT1nDJEGvgr50ypF9hrbG8mk86yDo%3Ds96-c"
         }
       ]
     }
