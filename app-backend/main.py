@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from authlib.integrations.starlette_client import OAuth
 from dotenv import load_dotenv
+from routes.auth import router as auth_router
 from pydantic import BaseModel
 import subprocess
 import os
@@ -256,6 +257,8 @@ async def track(request: Request):
         json.dump(profiles_data, f, indent=2)
 
     return {"status": "added"}
+
+app.include_router(auth_router, prefix="/api")
 
 if __name__ == "__main__":
     import uvicorn
