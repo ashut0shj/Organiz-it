@@ -41,7 +41,8 @@ const ProfileCard = ({ profile, index, onLaunch }) => {
 
   return (
     <div
-      className={`${getGradientClass(index)} rounded-xl p-4 text-white cursor-pointer hover:scale-105 transition-transform shadow-lg h-48 flex flex-col`}
+      className={"rounded-xl p-4 text-white cursor-pointer hover:scale-105 transition-transform shadow-lg h-48 flex flex-col"}
+      style={{ background: profile.color || '#6a49ff' }}
       onClick={() => onLaunch(profile)}
     >
       <div className="flex justify-between items-center mb-3">

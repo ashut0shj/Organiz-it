@@ -5,6 +5,7 @@ import './AddProfileModal.css';
 const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
   const [profileName, setProfileName] = useState('');
   const [apps, setApps] = useState([]);
+  const [profileColor, setProfileColor] = useState('#6a49ff'); // Default color
 
   // Convert backend app format to frontend format
   const convertBackendToFrontend = (backendApps) => {
@@ -37,6 +38,7 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
       console.log('Loading edit data for profile:', editProfile.name);
       setProfileName(editProfile.name);
       setApps(convertBackendToFrontend(editProfile.apps || []));
+      setProfileColor(editProfile.color || '#6a49ff');
     } else if (isOpen && !editProfile) {
       console.log('Resetting form - no edit profile');
       resetForm();
@@ -46,6 +48,7 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
   const resetForm = () => {
     setProfileName('');
     setApps([]);
+    setProfileColor('#6a49ff');
   };
 
   const handleClose = () => {
@@ -59,6 +62,7 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
       onAdd({
         name: profileName.trim(),
         apps: apps,
+        color: profileColor,
         id: editProfile?.id // Pass the ID if editing
       });
       resetForm();
@@ -147,6 +151,37 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
               placeholder="Enter workspace name"
               required
             />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Card Color</label>
+            <div style={{ display: 'flex', gap: 14, marginTop: 4 }}>
+              {['#6a49ff', '#22c55e', '#f59e42', '#ec4899', '#06b6d4'].map((color) => (
+                <button
+                  type="button"
+                  key={color}
+                  onClick={() => setProfileColor(color)}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    aspectRatio: '1/1', // Ensures perfect circle
+                    borderRadius: '50%',
+                    border: profileColor === color ? '2.5px solid #222' : '1.5px solid #e5e7eb',
+                    background: color,
+                    cursor: 'pointer',
+                    outline: 'none',
+                    boxShadow: profileColor === color ? '0 0 0 2px #6366f1' : '0 1px 2px rgba(0,0,0,0.07)',
+                    transition: 'box-shadow 0.18s, border 0.18s',
+                    position: 'relative',
+                    padding: 0,
+                  }}
+                  aria-label={`Choose color ${color}`}
+                  className="color-circle-btn"
+                >
+                  {/* No SVG or extra content, just a circle */}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="form-group">

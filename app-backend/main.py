@@ -29,7 +29,7 @@ app.add_middleware(
 )
 
 # Save profiles.json directly in the project directory (where main.py is)
-PROFILES_JSON_PATH = os.getenv("PROFILES_JSON_PATH") or os.path.join(os.path.dirname(__file__), "profiles/profiles.json")
+PROFILES_JSON_PATH = os.getenv("PROFILES_JSON_PATH") 
 
 # Initialize profiles.json if it doesn't exist
 if not os.path.exists(PROFILES_JSON_PATH):
@@ -169,21 +169,18 @@ async def launch_profile(req: ProfileRequest):
 async def create_profile(profile_data: dict):
     """Create a new profile"""
     profiles_data = load_profiles()
-    
     # Generate new ID
     new_id = str(len(profiles_data["profiles"]) + 1)
-    
     new_profile = {
         "id": new_id,
         "name": profile_data["name"],
+        "color": profile_data.get("color", "#6a49ff"),
         "date_created": datetime.now().isoformat() + "Z",
         "last_used": datetime.now().isoformat() + "Z",
         "apps": profile_data.get("apps", [])
     }
-    
     profiles_data["profiles"].append(new_profile)
     save_profiles(profiles_data)
-    
     return JSONResponse(content={"status": "success", "profile": new_profile})
 
 @app.delete("/profiles/{profile_id}")
@@ -208,7 +205,6 @@ async def delete_profile(profile_id: str):
 async def update_profile(profile_id: str, profile_data: dict):
     """Update a profile by ID"""
     profiles_data = load_profiles()
-    
     # Find the profile to update
     profile_found = False
     for i, profile in enumerate(profiles_data["profiles"]):
@@ -217,19 +213,18 @@ async def update_profile(profile_id: str, profile_data: dict):
             profiles_data["profiles"][i] = {
                 "id": profile_id,
                 "name": profile_data["name"],
+                "color": profile_data.get("color", profile.get("color", "#6a49ff")),
                 "date_created": profile["date_created"],  # Keep original creation date
                 "last_used": datetime.now().isoformat() + "Z",
                 "apps": profile_data.get("apps", [])
             }
             profile_found = True
             break
-    
     if not profile_found:
         return JSONResponse(
             content={"status": "error", "message": f"Profile with ID '{profile_id}' not found."},
             status_code=404
         )
-    
     save_profiles(profiles_data)
     return JSONResponse(content={"status": "success", "message": f"Profile updated successfully."})
 

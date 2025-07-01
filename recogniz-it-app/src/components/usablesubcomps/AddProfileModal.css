@@ -406,3 +406,10 @@
     flex-direction: column;
   }
 }
+
+.color-circle-btn:hover, .color-circle-btn:focus {
+  box-shadow: 0 0 0 3px #a5b4fc, 0 1px 2px rgba(0,0,0,0.10);
+  border-color: #6366f1;
+  outline: none;
+  z-index: 1;
+}

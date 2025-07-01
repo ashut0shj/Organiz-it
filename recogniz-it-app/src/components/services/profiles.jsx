@@ -88,6 +88,7 @@ const ProfileLauncher = () => {
       // Convert frontend format to backend format
       const backendProfile = {
         name: newProfile.name,
+        color: newProfile.color,
         apps: newProfile.apps.map(app => {
           if (app.type === 'browser') {
             return {
@@ -278,7 +279,7 @@ const ProfileLauncher = () => {
         <div className="workspacer-content">
           <div className="profiles-grid">
             {profiles.map((profile, index) => (
-              <div key={profile.id} className="profile-card" onClick={(event) => handleProfileClick(profile, event)}>
+              <div key={profile.id} className="profile-card" onClick={(event) => handleProfileClick(profile, event)} style={{ background: profile.color || '#6a49ff' }}>
                 <div className="profile-header">
                   <h3 className="profile-name">{profile.name}</h3>
                   <div className="profile-menu">
