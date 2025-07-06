@@ -13,6 +13,7 @@ from datetime import datetime
 import webbrowser
 import requests # type: ignore
 import platform
+import uuid
 
 load_dotenv()
 
@@ -145,7 +146,7 @@ async def launch_profile(req: ProfileRequest):
 @app.post("/profiles")
 async def create_profile(profile_data: dict):
     profiles_data = load_profiles()
-    new_id = str(len(profiles_data["profiles"]) + 1)
+    new_id = str(uuid.uuid4())
     new_profile = {
         "id": new_id,
         "name": profile_data["name"],
@@ -163,7 +164,7 @@ async def create_profile(profile_data: dict):
 async def delete_profile(profile_id: str):
     profiles_data = load_profiles()
     original_length = len(profiles_data["profiles"])
-    profiles_data["profiles"] = [p for p in profiles_data["profiles"] if p["id"] != profile_id]
+    profiles_data["profiles"] = [p for p in profiles_data["profiles"] if str(p["id"]) != str(profile_id)]
     if len(profiles_data["profiles"]) == original_length:
         return JSONResponse(
             content={"status": "error", "message": f"Profile with ID '{profile_id}' not found."},

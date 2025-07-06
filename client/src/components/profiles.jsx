@@ -321,6 +321,17 @@ const ProfileLauncher = () => {
           onAdd={handleAddProfile}
           editProfile={editingProfile}
         />
+        {deleteDialogOpen && (
+          <div className="delete-dialog-overlay">
+            <div className="delete-dialog">
+              <p>Are you sure you want to delete <b>{profileToDelete?.name}</b>?</p>
+              <div className="delete-dialog-actions">
+                <button onClick={confirmDeleteProfile} disabled={isDeleting} className="delete-dialog-confirm">{isDeleting ? 'Deleting...' : 'Delete'}</button>
+                <button onClick={() => setDeleteDialogOpen(false)} disabled={isDeleting} className="delete-dialog-cancel">Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

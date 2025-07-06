@@ -352,38 +352,113 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: #fff;
+  border: 1px solid rgba(99, 102, 241, 0.13);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  min-width: 140px;
+  box-shadow: 0 4px 16px rgba(106,73,255,0.10);
+  min-width: 120px;
+  max-width: 180px;
   z-index: 1000;
   overflow: hidden;
+  padding: 2px 0;
 }
 
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
-  padding: 8px 12px;
+  padding: 7px 12px;
   background: none;
   border: none;
   cursor: pointer;
   font-size: 13px;
-  color: #374151;
-  transition: background-color 0.2s ease;
+  color: #222;
+  transition: background 0.18s, color 0.18s;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-
 .menu-item:hover {
-  background: rgba(99, 102, 241, 0.05);
+  background: #f3f4f6;
+  color: #6a49ff;
 }
-
 .menu-item.delete {
-  color: #dc2626;
+  color: #ef4444;
+}
+.menu-item.delete:hover {
+  background: #fee2e2;
+  color: #b91c1c;
 }
 
-.menu-item.delete:hover {
-  background: rgba(220, 38, 38, 0.05);
+.delete-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.delete-dialog {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(106,73,255,0.10);
+  padding: 32px 28px;
+  min-width: 320px;
+  text-align: center;
+  position: relative;
+  color: #111;
+}
+
+.delete-dialog p {
+  color: #111;
+  font-size: 1.1rem;
+  margin-bottom: 18px;
+}
+
+.delete-dialog-confirm {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.18s;
+  box-shadow: 0 2px 8px rgba(239,68,68,0.08);
+}
+.delete-dialog-confirm:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.delete-dialog-cancel {
+  background: #f3f4f6;
+  color: #222;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.18s;
+  margin-left: 4px;
+}
+.delete-dialog-cancel:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.delete-dialog-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  justify-content: center;
 }
