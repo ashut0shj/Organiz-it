@@ -76,7 +76,11 @@ def open_profile_apps(profile_id):
                 url = app.get("url", "")
                 try:
                     if app_name == "Browser":
-                        if url.strip():
+                        if isinstance(url, list):
+                            for single_url in url:
+                                if single_url and single_url.strip():
+                                    webbrowser.open(single_url)
+                        elif url and url.strip():
                             webbrowser.open(url)
                     elif app_name == "VS Code":
                         subprocess.Popen(f'code "{url}"', shell=True)
@@ -104,7 +108,8 @@ def open_profile_apps(profile_id):
                         else:
                             webbrowser.open("https://web.whatsapp.com/")
                     else:
-                        subprocess.Popen([app_name.lower(), url])
+                        # Custom command - run the app_name as a command
+                        subprocess.Popen([app_name], shell=True)
                 except Exception as e:
                     print(f"Error opening {app['app_name']}: {e}")
             update_last_used(profile_id)

@@ -39,22 +39,29 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
   // Convert backend app format to frontend format
   const convertBackendToFrontend = (backendApps) => {
     return backendApps.map(app => {
-      if (app.open_command === 'browser') {
+      if (app.app_name === 'Browser') {
         // Handle both single URL (string) and multiple URLs (array)
-        const urls = Array.isArray(app.path_or_url) ? app.path_or_url : [app.path_or_url];
+        const urls = Array.isArray(app.url) ? app.url : [app.url];
         return {
           type: 'browser',
           urls: urls.filter(url => url && url.trim()) // Filter out empty URLs
         };
-      } else if (app.open_command === 'code') {
+      } else if (app.app_name === 'VS Code') {
         return {
           type: 'code',
-          path: app.path_or_url
+          path: app.url
         };
-      } else {
+      } else if (['Notepad', 'Spotify', 'Anaconda', 'WhatsApp'].includes(app.app_name)) {
         return {
           type: 'app',
-          command: app.open_command
+          command: app.app_name
+        };
+      } else {
+        // Custom command - treat as "Other"
+        return {
+          type: 'app',
+          command: 'Other',
+          customCommand: app.app_name
         };
       }
     });
@@ -122,6 +129,10 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
       }
     } else if (field === 'urls') {
       updatedApps[index].urls = value;
+    } else if (field === 'command' && value === 'Other') {
+      // When Other is selected, initialize customCommand field
+      updatedApps[index][field] = value;
+      updatedApps[index].customCommand = '';
     } else {
       updatedApps[index][field] = value;
     }
@@ -337,14 +348,32 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
 
                   {app.type === 'app' && (
                     <div className="app-content">
-                      <label className="field-label">Command</label>
-                      <input
-                        type="text"
-                        value={app.command || ''}
-                        onChange={(e) => updateApp(appIndex, 'command', e.target.value)}
-                        className="command-input"
-                        placeholder="notepad, figma, etc."
-                      />
+                      <label className="field-label">Application</label>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+                        <select
+                          value={app.command || ''}
+                          onChange={(e) => updateApp(appIndex, 'command', e.target.value)}
+                          className="command-input"
+                          style={{ flex: 1 }}
+                        >
+                          <option value="">Select an application</option>
+                          <option value="Notepad">Notepad</option>
+                          <option value="Spotify">Spotify</option>
+                          <option value="Anaconda">Anaconda</option>
+                          <option value="WhatsApp">WhatsApp</option>
+                          <option value="Other">Other</option>
+                        </select>
+                        {app.command === 'Other' && (
+                          <input
+                            type="text"
+                            value={app.customCommand || ''}
+                            onChange={(e) => updateApp(appIndex, 'customCommand', e.target.value)}
+                            className="command-input"
+                            placeholder="Command (e.g., firefox)"
+                            style={{ flex: 1 }}
+                          />
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

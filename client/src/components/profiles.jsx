@@ -46,7 +46,13 @@ const ProfileLauncher = () => {
         return <Globe size={14} />;
       case 'VS Code':
         return <Code size={14} />;
+      case 'Notepad':
+      case 'Spotify':
+      case 'Anaconda':
+      case 'WhatsApp':
+        return <Monitor size={14} />;
       default:
+        // For custom commands, still show Monitor icon
         return <Monitor size={14} />;
     }
   };
@@ -84,18 +90,24 @@ const ProfileLauncher = () => {
         emoji: newProfile.emoji,
         apps: newProfile.apps.map(app => {
           if (app.type === 'browser') {
+            const filteredUrls = app.urls.filter(url => url.trim());
             return {
               app_name: 'Browser',
-              url: app.urls.filter(url => url.trim())[0] || ''
+              url: filteredUrls.length === 1 ? filteredUrls[0] : filteredUrls
             };
           } else if (app.type === 'code') {
             return {
               app_name: 'VS Code',
               url: app.path
             };
+          } else if (app.type === 'app') {
+            return {
+              app_name: app.command === 'Other' ? app.customCommand : app.command,
+              url: ''
+            };
           } else {
             return {
-              app_name: app.command,
+              app_name: app.command === 'Other' ? app.customCommand : app.command,
               url: ''
             };
           }
