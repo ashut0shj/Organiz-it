@@ -60,9 +60,16 @@
   font-weight: 600;
   font-size: 16px;
   color: #fff;
-  padding: 14px 0 0 0;
+  padding: 14px 12px 0 12px;
   letter-spacing: 0.2px;
   text-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  word-break: break-word;
+  line-height: 1.2;
+  max-height: 2.6em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .profile-card-emoji {
@@ -115,6 +122,14 @@
   text-align: center;
   letter-spacing: 0.3px;
   text-shadow: 0 2px 8px rgba(0,0,0,0.13);
+  word-break: break-word;
+  line-height: 1.2;
+  max-height: 2.6em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  padding: 0 12px;
 }
 
 .profile-menu-btn {
@@ -310,6 +325,13 @@
   
   .stat-number {
     font-size: 24px;
+  }
+}
+
+@media (max-width: 400px) {
+  .profile-card-title,
+  .profile-card-title-noemoji span {
+    font-size: 13px !important;
   }
 }
 
