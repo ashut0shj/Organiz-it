@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import '../stylesheets/navbar.css';
 import { useAuth } from '../contexts/AuthContext';
+import LoginPopup from './LoginPopup';
 
 const Navbar = ({ profiles }) => {
   const { user, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   // Calculate total workspaces and total apps
   const totalWorkspaces = profiles.length;
@@ -21,7 +23,7 @@ const Navbar = ({ profiles }) => {
       <div className="navbar-right">
         <span className="navbar-count">Workspaces: <b>{totalWorkspaces}</b></span>
         <span className="navbar-count">Apps: <b>{totalApps}</b></span>
-        {user && user.picture && (
+        {user && user.picture ? (
           <div style={{ position: 'relative', marginLeft: 16 }}>
             <img
               src={user.picture}
@@ -54,7 +56,7 @@ const Navbar = ({ profiles }) => {
                   </div>
                 </div>
                 <button
-                  onClick={logout}
+                  onClick={() => { setShowDropdown(false); logout(); }}
                   style={{ width: '100%', background: '#f87171', color: 'white', border: 'none', borderRadius: 8, padding: '10px 0', fontWeight: 600, fontSize: 15, cursor: 'pointer', marginTop: 8 }}
                 >
                   Logout
@@ -62,6 +64,16 @@ const Navbar = ({ profiles }) => {
               </div>
             )}
           </div>
+        ) : (
+          <>
+            <button
+              style={{ marginLeft: 16, background: '#6a49ff', color: 'white', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}
+              onClick={() => setShowLogin(true)}
+            >
+              Login
+            </button>
+            {showLogin && <LoginPopup onClose={() => setShowLogin(false)} />}
+          </>
         )}
       </div>
     </nav>

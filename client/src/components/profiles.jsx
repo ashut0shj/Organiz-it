@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Code, Globe, Monitor, Plus, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import AddProfileModal from './AddProfileModal';
 import Navbar from './Navbar';
+import LoginPopup from './LoginPopup';
+import { useAuth } from '../contexts/AuthContext';
 import '../stylesheets/profiles.css';
 
 const ProfileLauncher = () => {
+  const { user } = useAuth();
   const [profiles, setProfiles] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -184,6 +187,17 @@ const ProfileLauncher = () => {
 
   const totalApps = profiles.reduce((total, profile) => total + getAppCount(profile.apps), 0);
   const totalItems = profiles.reduce((total, profile) => total + getAppCount(profile.apps), 0);
+
+  if (!user) {
+    return (
+      <>
+        <Navbar profiles={[]} />
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', minHeight: '80vh' }}>
+          <LoginPopup />
+        </div>
+      </>
+    );
+  }
 
   if (loading) {
     return (
