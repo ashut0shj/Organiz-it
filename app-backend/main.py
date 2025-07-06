@@ -17,10 +17,8 @@ load_dotenv()
 
 app = FastAPI()
 
-# Middleware for sessions
 app.add_middleware(SessionMiddleware, secret_key="super-secret-session-key")
 
-# CORS setup for frontend connection
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -29,15 +27,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Save profiles.json directly in the project directory (where main.py is)
 PROFILES_JSON_PATH = os.getenv("PROFILES_JSON_PATH") 
 
-# Initialize profiles.json if it doesn't exist
 if not os.path.exists(PROFILES_JSON_PATH):
     with open(PROFILES_JSON_PATH, "w") as f:
         json.dump({"profiles": []}, f, indent=2)
 
-# Google OAuth setup
 oauth = OAuth()
 oauth.register(
     name='google',
@@ -47,12 +42,10 @@ oauth.register(
     client_kwargs={'scope': 'openid email profile'},
 )
 
-# Pydantic model to parse incoming JSON for /launch endpoint
 class ProfileRequest(BaseModel):
     name: str
 
 def load_profiles():
-    """Load profiles from JSON file"""
     try:
         with open(PROFILES_JSON_PATH, "r") as f:
             return json.load(f)
@@ -60,12 +53,10 @@ def load_profiles():
         return {"profiles": []}
 
 def save_profiles(profiles_data):
-    """Save profiles to JSON file"""
     with open(PROFILES_JSON_PATH, "w") as f:
         json.dump(profiles_data, f, indent=2)
 
 def update_last_used(profile_id):
-    """Update the last_used timestamp for a profile"""
     profiles_data = load_profiles()
     for profile in profiles_data["profiles"]:
         if profile["id"] == profile_id:
@@ -74,36 +65,26 @@ def update_last_used(profile_id):
             break
 
 def open_profile_apps(profile_id):
-    """Open all apps for a given profile"""
     profiles_data = load_profiles()
-    
     for profile in profiles_data["profiles"]:
         if profile["id"] == profile_id:
             for app in profile["apps"]:
                 open_command = app["open_command"]
                 path_or_url = app["path_or_url"]
-                
                 try:
                     if open_command == "browser":
-                        # Handle multiple URLs for browser apps
                         if isinstance(path_or_url, list):
-                            # If path_or_url is a list, open each URL
                             for url in path_or_url:
-                                if url.strip():  # Only open non-empty URLs
+                                if url.strip():
                                     webbrowser.open(url)
                         else:
-                            # If path_or_url is a single string, open it
                             webbrowser.open(path_or_url)
                     elif open_command == "code":
-                        # Open VS Code with path
                         subprocess.Popen(f'code "{path_or_url}"', shell=True)
                     else:
-                        # Try to open with the specified command
                         subprocess.Popen([open_command, path_or_url])
                 except Exception as e:
                     print(f"Error opening {app['app_name']}: {e}")
-            
-            # Update last_used timestamp
             update_last_used(profile_id)
             break
 
@@ -113,31 +94,24 @@ async def home():
 
 @app.get("/profiles")
 async def get_profiles():
-    """Get all profiles"""
     profiles_data = load_profiles()
     return JSONResponse(content=profiles_data)
 
 @app.post("/launch")
 async def launch_profile(req: ProfileRequest):
     profile_name = req.name.lower().strip()
-    
     profiles_data = load_profiles()
-    
-    # Find profile by name (case-insensitive)
     profile_id = None
     for profile in profiles_data["profiles"]:
         if profile["name"].lower() == profile_name:
             profile_id = profile["id"]
             break
-    
     if not profile_id:
         return JSONResponse(
             content={"status": "error", "message": f"Profile '{profile_name}' not found."},
             status_code=404
         )
-
     try:
-        # Open all apps for the profile
         open_profile_apps(profile_id)
         return JSONResponse(content={"status": "success", "message": f"Profile '{profile_name}' launched."})
     except Exception as e:
@@ -145,9 +119,7 @@ async def launch_profile(req: ProfileRequest):
 
 @app.post("/profiles")
 async def create_profile(profile_data: dict):
-    """Create a new profile"""
     profiles_data = load_profiles()
-    # Generate new ID
     new_id = str(len(profiles_data["profiles"]) + 1)
     new_profile = {
         "id": new_id,
@@ -164,37 +136,29 @@ async def create_profile(profile_data: dict):
 
 @app.delete("/profiles/{profile_id}")
 async def delete_profile(profile_id: str):
-    """Delete a profile by ID"""
     profiles_data = load_profiles()
-    
-    # Find and remove the profile
     original_length = len(profiles_data["profiles"])
     profiles_data["profiles"] = [p for p in profiles_data["profiles"] if p["id"] != profile_id]
-    
     if len(profiles_data["profiles"]) == original_length:
         return JSONResponse(
             content={"status": "error", "message": f"Profile with ID '{profile_id}' not found."},
             status_code=404
         )
-    
     save_profiles(profiles_data)
     return JSONResponse(content={"status": "success", "message": f"Profile deleted successfully."})
 
 @app.put("/profiles/{profile_id}")
 async def update_profile(profile_id: str, profile_data: dict):
-    """Update a profile by ID"""
     profiles_data = load_profiles()
-    # Find the profile to update
     profile_found = False
     for i, profile in enumerate(profiles_data["profiles"]):
         if profile["id"] == profile_id:
-            # Update the profile data
             profiles_data["profiles"][i] = {
                 "id": profile_id,
                 "name": profile_data["name"],
                 "color": profile_data.get("color", profile.get("color", "#6a49ff")),
                 "emoji": profile_data.get("emoji", profile.get("emoji", "")),
-                "date_created": profile["date_created"],  # Keep original creation date
+                "date_created": profile["date_created"],
                 "last_used": datetime.now().isoformat() + "Z",
                 "apps": profile_data.get("apps", [])
             }
@@ -218,23 +182,18 @@ async def track(request: Request):
     data = await request.json()
     profile_name = data["profile"]
     url = data["url"]
-        
     with open(PROFILES_JSON_PATH, "r") as f:
         profiles_data = json.load(f)
-
     for profile in profiles_data["profiles"]:
         if profile["name"] == profile_name:
-            # Append the URL as a new browser app
             profile["apps"].append({
                 "app_name": "Browser",
                 "open_command": "browser",
                 "path_or_url": url
             })
             break
-
     with open(PROFILES_JSON_PATH, "w") as f:
         json.dump(profiles_data, f, indent=2)
-
     return {"status": "added"}
 
 @app.post("/api/auth/google")
@@ -243,13 +202,11 @@ async def google_login(request: Request):
     token = data.get("credential")
     if not token:
         return JSONResponse(content={"error": "Missing credential"}, status_code=400)
-
     google_resp = requests.get(
         f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
     )
     if google_resp.status_code != 200:
         return JSONResponse(content={"error": "Invalid token"}, status_code=401)
-
     user_info = google_resp.json()
     return JSONResponse(content={"user": user_info})
 

@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 export default function LoginPopup({ onClose }) {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <div style={{
@@ -16,7 +18,7 @@ export default function LoginPopup({ onClose }) {
           <h2 style={{ marginBottom: 24, color: '#6a49ff' }}>Sign in to Organiz-it</h2>
           <GoogleLogin
             onSuccess={async credentialResponse => {
-              const res = await fetch('http://localhost:8000/api/auth/google', {
+              const res = await fetch(`${API_BASE}/api/auth/google`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ credential: credentialResponse.credential }),

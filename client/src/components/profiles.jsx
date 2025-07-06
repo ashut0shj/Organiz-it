@@ -17,6 +17,7 @@ const ProfileLauncher = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [profileToDelete, setProfileToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     fetchProfiles();
@@ -25,7 +26,7 @@ const ProfileLauncher = () => {
   const fetchProfiles = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8000/profiles");
+      const response = await fetch(`${API_BASE}/profiles`);
       if (!response.ok) {
         throw new Error('Failed to fetch profiles');
       }
@@ -57,7 +58,7 @@ const ProfileLauncher = () => {
   const handleProfileLaunch = async (profile) => {
     console.log('Launching profile:', profile.name);
     try {
-      const response = await fetch("http://localhost:8000/launch", {
+      const response = await fetch(`${API_BASE}/launch`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +106,7 @@ const ProfileLauncher = () => {
       };
       let response;
       if (newProfile.id) {
-        response = await fetch(`http://localhost:8000/profiles/${newProfile.id}`, {
+        response = await fetch(`${API_BASE}/profiles/${newProfile.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -113,7 +114,7 @@ const ProfileLauncher = () => {
           body: JSON.stringify(backendProfile),
         });
       } else {
-        response = await fetch("http://localhost:8000/profiles", {
+        response = await fetch(`${API_BASE}/profiles`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -141,7 +142,7 @@ const ProfileLauncher = () => {
     if (!profileToDelete) return;
     setIsDeleting(true);
     try {
-      const response = await fetch(`http://localhost:8000/profiles/${profileToDelete.id}`, {
+      const response = await fetch(`${API_BASE}/profiles/${profileToDelete.id}`, {
         method: "DELETE",
       });
       if (response.ok) {

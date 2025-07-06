@@ -1,5 +1,5 @@
-import bcrypt
-from jose import jwt
+import bcrypt# type: ignore
+from jose import jwt # type: ignore
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
