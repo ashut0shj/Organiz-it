@@ -40,11 +40,11 @@ const ProfileLauncher = () => {
     }
   };
 
-  const getAppTypeIcon = (openCommand) => {
-    switch (openCommand) {
-      case 'browser':
+  const getAppTypeIcon = (appName) => {
+    switch (appName) {
+      case 'Browser':
         return <Globe size={14} />;
-      case 'code':
+      case 'VS Code':
         return <Code size={14} />;
       default:
         return <Monitor size={14} />;
@@ -86,20 +86,17 @@ const ProfileLauncher = () => {
           if (app.type === 'browser') {
             return {
               app_name: 'Browser',
-              open_command: 'browser',
-              path_or_url: app.urls.filter(url => url.trim())
+              url: app.urls.filter(url => url.trim())[0] || ''
             };
           } else if (app.type === 'code') {
             return {
               app_name: 'VS Code',
-              open_command: 'code',
-              path_or_url: app.path
+              url: app.path
             };
           } else {
             return {
               app_name: app.command,
-              open_command: app.command,
-              path_or_url: ''
+              url: ''
             };
           }
         })
@@ -243,7 +240,7 @@ const ProfileLauncher = () => {
                 onClick={(event) => handleProfileClick(profile, event)}
                 style={{ background: profile.color || '#6a49ff' }}
               >
-                {profile.emoji ? (
+                {profile.emoji && profile.emoji.trim() ? (
                   <>
                     <div className="profile-card-title">{profile.name}</div>
                     <div className="profile-card-emoji"><span>{profile.emoji}</span></div>
@@ -254,7 +251,7 @@ const ProfileLauncher = () => {
                         if (profile.apps) {
                           for (let i = 0; i < profile.apps.length; i++) {
                             const app = profile.apps[i];
-                            const type = app.open_command;
+                            const type = app.app_name;
                             if (!shownTypes.has(type)) {
                               shownTypes.add(type);
                               uniqueApps.push(app);
@@ -264,16 +261,40 @@ const ProfileLauncher = () => {
                         }
                         return uniqueApps.map((app, appIndex) => (
                           <div key={appIndex} className="profile-card-app">
-                            {getAppTypeIcon(app.open_command)}
+                            {getAppTypeIcon(app.app_name)}
                           </div>
                         ));
                       })()}
                     </div>
                   </>
                 ) : (
-                  <div className="profile-card-title-noemoji">
-                    <span>{profile.name}</span>
-                  </div>
+                  <>
+                    <div className="profile-card-title-noemoji">
+                      <span>{profile.name}</span>
+                    </div>
+                    {profile.apps && profile.apps.length > 0 && (
+                      <div className="profile-card-apps">
+                        {(() => {
+                          const shownTypes = new Set();
+                          const uniqueApps = [];
+                          for (let i = 0; i < profile.apps.length; i++) {
+                            const app = profile.apps[i];
+                            const type = app.app_name;
+                            if (!shownTypes.has(type)) {
+                              shownTypes.add(type);
+                              uniqueApps.push(app);
+                            }
+                            if (uniqueApps.length === 6) break;
+                          }
+                          return uniqueApps.map((app, appIndex) => (
+                            <div key={appIndex} className="profile-card-app">
+                              {getAppTypeIcon(app.app_name)}
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                    )}
+                  </>
                 )}
                 {/* Profile menu button (edit/delete) remains top right, absolute */}
                 <div className="profile-menu" style={{ position: 'absolute', top: 10, right: 10, zIndex: 2 }}>

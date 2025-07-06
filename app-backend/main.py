@@ -72,24 +72,20 @@ def open_profile_apps(profile_id):
     for profile in profiles_data["profiles"]:
         if profile["id"] == profile_id:
             for app in profile["apps"]:
-                open_command = app["open_command"]
-                path_or_url = app["path_or_url"]
+                app_name = app["app_name"]
+                url = app.get("url", "")
                 try:
-                    if open_command == "browser":
-                        if isinstance(path_or_url, list):
-                            for url in path_or_url:
-                                if url.strip():
-                                    webbrowser.open(url)
-                        else:
-                            webbrowser.open(path_or_url)
-                    elif open_command == "code":
-                        subprocess.Popen(f'code "{path_or_url}"', shell=True)
-                    elif open_command == "notepad":
+                    if app_name == "Browser":
+                        if url.strip():
+                            webbrowser.open(url)
+                    elif app_name == "VS Code":
+                        subprocess.Popen(f'code "{url}"', shell=True)
+                    elif app_name == "Notepad":
                         if os_type == "windows":
                             subprocess.Popen(["notepad.exe"])
                         else:
                             subprocess.Popen(["gedit"])
-                    elif open_command == "spotify":
+                    elif app_name == "Spotify":
                         if os_type == "windows":
                             subprocess.Popen(["spotify.exe"])
                         else:
@@ -97,18 +93,18 @@ def open_profile_apps(profile_id):
                                 subprocess.Popen(["spotify"])
                             except Exception:
                                 webbrowser.open("https://open.spotify.com/")
-                    elif open_command == "anaconda":
+                    elif app_name == "Anaconda":
                         if os_type == "windows":
                             subprocess.Popen(["anaconda-navigator.exe"])
                         else:
                             subprocess.Popen(["anaconda-navigator"])
-                    elif open_command == "whatsapp":
+                    elif app_name == "WhatsApp":
                         if os_type == "windows":
                             subprocess.Popen(["WhatsApp.exe"])
                         else:
                             webbrowser.open("https://web.whatsapp.com/")
                     else:
-                        subprocess.Popen([open_command, path_or_url])
+                        subprocess.Popen([app_name.lower(), url])
                 except Exception as e:
                     print(f"Error opening {app['app_name']}: {e}")
             update_last_used(profile_id)
@@ -214,8 +210,7 @@ async def track(request: Request):
         if profile["name"] == profile_name:
             profile["apps"].append({
                 "app_name": "Browser",
-                "open_command": "browser",
-                "path_or_url": url
+                "url": url
             })
             break
     with open(PROFILES_JSON_PATH, "w") as f:
@@ -235,6 +230,7 @@ async def google_login(request: Request):
         return JSONResponse(content={"error": "Invalid token"}, status_code=401)
     user_info = google_resp.json()
     return JSONResponse(content={"user": user_info})
+
 
 if __name__ == "__main__":
     import uvicorn # type: ignore
