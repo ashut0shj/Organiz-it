@@ -123,3 +123,80 @@
     padding: 0.3rem 0.6rem;
   }
 }
+
+.navbar-profile-img-wrapper {
+  position: relative;
+  margin-left: 16px;
+}
+
+.navbar-profile-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #8b5cf6;
+  object-fit: cover;
+}
+
+.navbar-dropdown {
+  position: absolute;
+  right: 0;
+  top: 44px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(106,73,255,0.10);
+  min-width: 220px;
+  z-index: 100;
+  padding: 18px;
+  text-align: left;
+  color: #222;
+  font-size: 15px;
+}
+
+.navbar-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.navbar-dropdown-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.navbar-dropdown-name {
+  font-weight: 600;
+}
+
+.navbar-dropdown-email {
+  font-size: 13px;
+  color: #888;
+}
+
+.navbar-logout-btn {
+  width: 100%;
+  background: #f87171;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 0;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.navbar-login-btn {
+  margin-left: 16px;
+  background: #6a49ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}

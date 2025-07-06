@@ -207,15 +207,7 @@ const ProfileLauncher = () => {
         <div className="workspacer-container">
           <div className="workspacer-content">
             <div className="profiles-grid">
-              <div style={{ 
-                gridColumn: '1 / -1', 
-                textAlign: 'center', 
-                color: '#94a3b8', 
-                fontSize: '18px',
-                padding: '40px' 
-              }}>
-                Loading profiles...
-              </div>
+              <div className="profiles-loading">Loading profiles...</div>
             </div>
           </div>
         </div>
@@ -230,15 +222,7 @@ const ProfileLauncher = () => {
         <div className="workspacer-container">
           <div className="workspacer-content">
             <div className="profiles-grid">
-              <div style={{ 
-                gridColumn: '1 / -1', 
-                textAlign: 'center', 
-                color: '#f87171', 
-                fontSize: '18px',
-                padding: '40px' 
-              }}>
-                Error loading profiles: {error}
-              </div>
+              <div className="profiles-error">Error loading profiles: {error}</div>
             </div>
           </div>
         </div>
@@ -257,57 +241,13 @@ const ProfileLauncher = () => {
                 key={profile.id}
                 className="profile-card"
                 onClick={(event) => handleProfileClick(profile, event)}
-                style={{
-                  background: profile.color || '#6a49ff',
-                  position: 'relative',
-                  width: 160,
-                  height: 160,
-                  borderRadius: 18,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  boxShadow: '0 2px 12px rgba(106,73,255,0.08)',
-                  cursor: 'pointer',
-                  padding: 0,
-                  margin: 0,
-                  overflow: 'hidden',
-                  transition: 'box-shadow 0.18s',
-                }}
+                style={{ background: profile.color || '#6a49ff' }}
               >
                 {profile.emoji ? (
                   <>
-                    <div style={{
-                      width: '100%',
-                      textAlign: 'center',
-                      fontWeight: 600,
-                      fontSize: 16,
-                      color: '#fff',
-                      padding: '14px 0 0 0',
-                      letterSpacing: 0.2,
-                      textShadow: '0 1px 4px rgba(0,0,0,0.10)'
-                    }}>{profile.name}</div>
-                    <div style={{
-                      flex: 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '100%',
-                    }}>
-                      <span style={{
-                        fontSize: '3.2rem',
-                        lineHeight: 1,
-                        userSelect: 'none',
-                        filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.10))',
-                      }}>{profile.emoji}</span>
-                    </div>
-                    <div style={{
-                      width: '100%',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      gap: 6,
-                      padding: '0 0 12px 0',
-                    }}>
+                    <div className="profile-card-title">{profile.name}</div>
+                    <div className="profile-card-emoji"><span>{profile.emoji}</span></div>
+                    <div className="profile-card-apps">
                       {(() => {
                         const shownTypes = new Set();
                         const uniqueApps = [];
@@ -323,18 +263,7 @@ const ProfileLauncher = () => {
                           }
                         }
                         return uniqueApps.map((app, appIndex) => (
-                          <div key={appIndex} style={{
-                            width: 22,
-                            height: 22,
-                            background: 'rgba(255,255,255,0.13)',
-                            borderRadius: 6,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            border: '1.5px solid rgba(255,255,255,0.18)',
-                            margin: 0,
-                            padding: 0,
-                          }}>
+                          <div key={appIndex} className="profile-card-app">
                             {getAppTypeIcon(app.open_command)}
                           </div>
                         ));
@@ -342,22 +271,8 @@ const ProfileLauncher = () => {
                     </div>
                   </>
                 ) : (
-                  <div style={{
-                    flex: 1,
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                    <span style={{
-                      fontWeight: 800,
-                      fontSize: 26,
-                      color: '#fff',
-                      textAlign: 'center',
-                      letterSpacing: 0.3,
-                      textShadow: '0 2px 8px rgba(0,0,0,0.13)'
-                    }}>{profile.name}</span>
+                  <div className="profile-card-title-noemoji">
+                    <span>{profile.name}</span>
                   </div>
                 )}
                 {/* Profile menu button (edit/delete) remains top right, absolute */}

@@ -31,11 +31,11 @@ const Navbar = ({ profiles }) => {
           <RefreshCw size={20} color="#6a49ff" />
         </button>
         {user && user.picture ? (
-          <div style={{ position: 'relative', marginLeft: 16 }}>
+          <div className="navbar-profile-img-wrapper">
             <img
               src={user.picture}
               alt="Profile"
-              style={{ width: 36, height: 36, borderRadius: '50%', cursor: 'pointer', border: '2px solid #8b5cf6', objectFit: 'cover' }}
+              className="navbar-profile-img"
               onClick={() => setShowDropdown(v => !v)}
               onError={e => {
                 e.target.onerror = null;
@@ -43,28 +43,25 @@ const Navbar = ({ profiles }) => {
               }}
             />
             {showDropdown && (
-              <div style={{
-                position: 'absolute', right: 0, top: 44, background: 'white', borderRadius: 12, boxShadow: '0 4px 24px rgba(106,73,255,0.10)', minWidth: 220, zIndex: 100,
-                padding: 18, textAlign: 'left', color: '#222', fontSize: 15
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+              <div className="navbar-dropdown">
+                <div className="navbar-dropdown-header">
                   <img
                     src={user.picture}
                     alt="Profile"
-                    style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover' }}
+                    className="navbar-dropdown-img"
                     onError={e => {
                       e.target.onerror = null;
                       e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name || user.email);
                     }}
                   />
                   <div>
-                    <div style={{ fontWeight: 600 }}>{user.name || user.given_name}</div>
-                    <div style={{ fontSize: 13, color: '#888' }}>{user.email}</div>
+                    <div className="navbar-dropdown-name">{user.name || user.given_name}</div>
+                    <div className="navbar-dropdown-email">{user.email}</div>
                   </div>
                 </div>
                 <button
                   onClick={() => { setShowDropdown(false); logout(); }}
-                  style={{ width: '100%', background: '#f87171', color: 'white', border: 'none', borderRadius: 8, padding: '10px 0', fontWeight: 600, fontSize: 15, cursor: 'pointer', marginTop: 8 }}
+                  className="navbar-logout-btn"
                 >
                   Logout
                 </button>
@@ -74,7 +71,7 @@ const Navbar = ({ profiles }) => {
         ) : (
           <>
             <button
-              style={{ marginLeft: 16, background: '#6a49ff', color: 'white', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}
+              className="navbar-login-btn"
               onClick={() => setShowLogin(true)}
             >
               Login
