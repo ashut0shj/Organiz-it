@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request # type: ignore
+from fastapi import FastAPI, Request, APIRouter # type: ignore
 from fastapi.responses import RedirectResponse, JSONResponse # type: ignore
 from fastapi.middleware.cors import CORSMiddleware # type: ignore
 from starlette.middleware.sessions import SessionMiddleware # type: ignore
@@ -11,6 +11,7 @@ import urllib.parse
 import json
 from datetime import datetime
 import webbrowser
+import requests # type: ignore
 
 load_dotenv()
 
@@ -236,6 +237,21 @@ async def track(request: Request):
 
     return {"status": "added"}
 
+@app.post("/api/auth/google")
+async def google_login(request: Request):
+    data = await request.json()
+    token = data.get("credential")
+    if not token:
+        return JSONResponse(content={"error": "Missing credential"}, status_code=400)
+
+    google_resp = requests.get(
+        f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
+    )
+    if google_resp.status_code != 200:
+        return JSONResponse(content={"error": "Invalid token"}, status_code=401)
+
+    user_info = google_resp.json()
+    return JSONResponse(content={"user": user_info})
 
 if __name__ == "__main__":
     import uvicorn # type: ignore
