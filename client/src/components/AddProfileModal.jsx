@@ -91,9 +91,9 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (profileName.trim() && apps.length > 0) {
+    if (profileName.trim() || profileEmoji.trim()) {
       onAdd({
-        name: profileName.trim(),
+        name: profileName.trim() || '',
         apps: apps,
         color: profileColor,
         emoji: profileEmoji,
@@ -184,8 +184,7 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
               value={profileName}
               onChange={(e) => setProfileName(e.target.value)}
               className="form-input"
-              placeholder="Enter workspace name"
-              required
+              placeholder="Enter workspace name (optional)"
               style={{ flex: 1 }}
             />
             <button
@@ -380,7 +379,7 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
             <button
               type="submit"
               className="submit-button"
-              disabled={!profileName.trim() || apps.length === 0}
+              disabled={!profileName.trim() && !profileEmoji.trim()}
             >
               {editProfile ? 'Update Workspace' : 'Add Workspace'}
             </button>
