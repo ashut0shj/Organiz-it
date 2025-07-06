@@ -108,7 +108,6 @@ def open_profile_apps(profile_id):
                         else:
                             webbrowser.open("https://web.whatsapp.com/")
                     else:
-                        # Custom command - run the app_name as a command
                         subprocess.Popen([app_name], shell=True)
                 except Exception as e:
                     print(f"Error opening {app['app_name']}: {e}")

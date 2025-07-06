@@ -5,7 +5,7 @@ import '../stylesheets/AddProfileModal.css';
 const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
   const [profileName, setProfileName] = useState('');
   const [apps, setApps] = useState([]);
-  const [profileColor, setProfileColor] = useState('#6a49ff'); // Default color
+  const [profileColor, setProfileColor] = useState('#6a49ff');
   const [profileEmoji, setProfileEmoji] = useState('');
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const emojiList = [
@@ -17,7 +17,6 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
 
   const emojiPickerRef = useRef(null);
 
-  // Close emoji picker on outside click or Escape
   useEffect(() => {
     if (!emojiPickerOpen) return;
     function handleClick(e) {
@@ -36,15 +35,13 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
     };
   }, [emojiPickerOpen]);
 
-  // Convert backend app format to frontend format
   const convertBackendToFrontend = (backendApps) => {
     return backendApps.map(app => {
       if (app.app_name === 'Browser') {
-        // Handle both single URL (string) and multiple URLs (array)
         const urls = Array.isArray(app.url) ? app.url : [app.url];
         return {
           type: 'browser',
-          urls: urls.filter(url => url && url.trim()) // Filter out empty URLs
+          urls: urls.filter(url => url && url.trim())
         };
       } else if (app.app_name === 'VS Code') {
         return {
@@ -57,7 +54,6 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
           command: app.app_name
         };
       } else {
-        // Custom command - treat as "Other"
         return {
           type: 'app',
           command: 'Other',
@@ -67,7 +63,6 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
     });
   };
 
-  // Load edit data when modal opens or editProfile changes
   useEffect(() => {
     console.log('AddProfileModal useEffect - isOpen:', isOpen, 'editProfile:', editProfile);
     if (isOpen && editProfile) {
@@ -102,7 +97,7 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
         apps: apps,
         color: profileColor,
         emoji: profileEmoji,
-        id: editProfile?.id // Pass the ID if editing
+        id: editProfile?.id
       });
       resetForm();
     }
@@ -119,7 +114,6 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
   const updateApp = (index, field, value) => {
     const updatedApps = [...apps];
     if (field === 'type') {
-      // Reset app data when type changes
       if (value === 'browser') {
         updatedApps[index] = { type: value, urls: [''] };
       } else if (value === 'code') {
@@ -130,7 +124,6 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
     } else if (field === 'urls') {
       updatedApps[index].urls = value;
     } else if (field === 'command' && value === 'Other') {
-      // When Other is selected, initialize customCommand field
       updatedApps[index][field] = value;
       updatedApps[index].customCommand = '';
     } else {
@@ -245,7 +238,7 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
                   style={{
                     width: 28,
                     height: 28,
-                    aspectRatio: '1/1', // Ensures perfect circle
+                    aspectRatio: '1/1',
                     borderRadius: '50%',
                     border: profileColor === color ? '2.5px solid #222' : '1.5px solid #e5e7eb',
                     background: color,
@@ -258,9 +251,8 @@ const AddProfileModal = ({ isOpen, onClose, onAdd, editProfile = null }) => {
                   }}
                   aria-label={`Choose color ${color}`}
                   className="color-circle-btn"
-                >
-                  {/* No SVG or extra content, just a circle */}
-                </button>
+                                  >
+                  </button>
               ))}
             </div>
           </div>
