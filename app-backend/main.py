@@ -1,11 +1,11 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import RedirectResponse, JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware
-from authlib.integrations.starlette_client import OAuth
+from fastapi import FastAPI, Request # type: ignore
+from fastapi.responses import RedirectResponse, JSONResponse # type: ignore
+from fastapi.middleware.cors import CORSMiddleware # type: ignore
+from starlette.middleware.sessions import SessionMiddleware # type: ignore
+from authlib.integrations.starlette_client import OAuth # type: ignore
 from dotenv import load_dotenv
 from routes.auth import router as auth_router
-from pydantic import BaseModel
+from pydantic import BaseModel # type: ignore
 import subprocess
 import os
 import urllib.parse
@@ -263,5 +263,5 @@ async def track(request: Request):
 app.include_router(auth_router, prefix="/api")
 
 if __name__ == "__main__":
-    import uvicorn
+    import uvicorn # type: ignore
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

@@ -1,14 +1,14 @@
 # main.py
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware
+from fastapi import FastAPI  # type: ignore
+from fastapi.middleware.cors import CORSMiddleware # type: ignore
+from starlette.middleware.sessions import SessionMiddleware # type: ignore
 from dotenv import load_dotenv
 import os
 
 from routes.auth import router as auth_router
 from routes.google_oauth import router as google_router
-from routes.profile import router as profile_router
-from routes.track import router as track_router
+from routes.profile import router as profile_router # type: ignore
+from routes.track import router as track_router # type: ignore
 
 load_dotenv()
 
@@ -37,5 +37,5 @@ async def home():
     return {"message": "FastAPI Google Login Backend Running"}
 
 if __name__ == "__main__":
-    import uvicorn
+    import uvicorn # type: ignore
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
