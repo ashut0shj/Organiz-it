@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../stylesheets/navbar.css';
 import { useAuth } from '../contexts/AuthContext';
 import LoginPopup from './LoginPopup';
+import { RefreshCw } from 'lucide-react';
 
 const Navbar = ({ profiles }) => {
   const { user, logout } = useAuth();
@@ -23,6 +24,12 @@ const Navbar = ({ profiles }) => {
       <div className="navbar-right">
         <span className="navbar-count">Workspaces: <b>{totalWorkspaces}</b></span>
         <span className="navbar-count">Apps: <b>{totalApps}</b></span>
+        <button
+          className="navbar-sync-btn"
+          title="Sync"
+        >
+          <RefreshCw size={20} color="#6a49ff" />
+        </button>
         {user && user.picture ? (
           <div style={{ position: 'relative', marginLeft: 16 }}>
             <img
