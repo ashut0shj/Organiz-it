@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware # type: ignore
 from starlette.middleware.sessions import SessionMiddleware # type: ignore
 from authlib.integrations.starlette_client import OAuth # type: ignore
 from dotenv import load_dotenv
-from routes.auth import router as auth_router
 from pydantic import BaseModel # type: ignore
 import subprocess
 import os
@@ -110,29 +109,6 @@ def open_profile_apps(profile_id):
 @app.get("/")
 async def home():
     return {"message": "FastAPI Google Login Backend Running"}
-
-@app.get("/login")
-async def login(request: Request):
-    redirect_uri = "http://localhost:8000/auth/callback"
-    return await oauth.google.authorize_redirect(request, redirect_uri)
-
-@app.get("/auth/callback")
-async def auth_callback(request: Request):
-    try:
-        token = await oauth.google.authorize_access_token(request)
-        user = token.get("userinfo")
-
-        params = urllib.parse.urlencode({
-            "email": user.get("email", ""),
-            "name": user.get("name", ""),
-            "picture": user.get("picture", "")
-        })
-        redirect_url = f"http://localhost:5173/profile?{params}"
-        return RedirectResponse(url=redirect_url)
-
-    except Exception as e:
-        error_url = f"http://localhost:5173/error?msg={urllib.parse.quote(str(e))}"
-        return RedirectResponse(url=error_url)
 
 @app.get("/profiles")
 async def get_profiles():
@@ -260,7 +236,6 @@ async def track(request: Request):
 
     return {"status": "added"}
 
-app.include_router(auth_router, prefix="/api")
 
 if __name__ == "__main__":
     import uvicorn # type: ignore
