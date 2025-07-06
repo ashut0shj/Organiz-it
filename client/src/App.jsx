@@ -11,6 +11,7 @@ function ProtectedRoute({ children }) {
 }
 
 function App() {
+  const { user } = useAuth();
   return (
     <Router>
       <Routes>
@@ -20,6 +21,7 @@ function App() {
             <ProfileLauncher />
           </ProtectedRoute>
         } />
+        <Route path="*" element={user ? <Navigate to="/" replace /> : <Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );
