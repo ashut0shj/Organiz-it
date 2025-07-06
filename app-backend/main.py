@@ -12,6 +12,7 @@ import json
 from datetime import datetime
 import webbrowser
 import requests # type: ignore
+import platform
 
 load_dotenv()
 
@@ -66,6 +67,7 @@ def update_last_used(profile_id):
 
 def open_profile_apps(profile_id):
     profiles_data = load_profiles()
+    os_type = platform.system().lower()
     for profile in profiles_data["profiles"]:
         if profile["id"] == profile_id:
             for app in profile["apps"]:
@@ -81,6 +83,29 @@ def open_profile_apps(profile_id):
                             webbrowser.open(path_or_url)
                     elif open_command == "code":
                         subprocess.Popen(f'code "{path_or_url}"', shell=True)
+                    elif open_command == "notepad":
+                        if os_type == "windows":
+                            subprocess.Popen(["notepad.exe"])
+                        else:
+                            subprocess.Popen(["gedit"])
+                    elif open_command == "spotify":
+                        if os_type == "windows":
+                            subprocess.Popen(["spotify.exe"])
+                        else:
+                            try:
+                                subprocess.Popen(["spotify"])
+                            except Exception:
+                                webbrowser.open("https://open.spotify.com/")
+                    elif open_command == "anaconda":
+                        if os_type == "windows":
+                            subprocess.Popen(["anaconda-navigator.exe"])
+                        else:
+                            subprocess.Popen(["anaconda-navigator"])
+                    elif open_command == "whatsapp":
+                        if os_type == "windows":
+                            subprocess.Popen(["WhatsApp.exe"])
+                        else:
+                            webbrowser.open("https://web.whatsapp.com/")
                     else:
                         subprocess.Popen([open_command, path_or_url])
                 except Exception as e:
