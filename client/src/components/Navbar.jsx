@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import '../stylesheets/navbar.css';
 import { useAuth } from '../contexts/AuthContext';
-import LoginPopup from './LoginPopup';
 import { RefreshCw } from 'lucide-react';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = ({ profiles }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, login } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
+  const navigate = useNavigate();
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
   // Calculate total workspaces and total apps
   const totalWorkspaces = profiles.length;
@@ -69,15 +71,28 @@ const Navbar = ({ profiles }) => {
             )}
           </div>
         ) : (
-          <>
-            <button
-              className="navbar-login-btn"
-              onClick={() => setShowLogin(true)}
-            >
-              Login
-            </button>
-            {showLogin && <LoginPopup onClose={() => setShowLogin(false)} />}
-          </>
+          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+            <GoogleLogin
+              onSuccess={async credentialResponse => {
+                const res = await fetch(`${API_BASE}/api/auth/google`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ credential: credentialResponse.credential }),
+                });
+                const data = await res.json();
+                if (data.user) {
+                  login(data.user);
+                  navigate('/');
+                }
+              }}
+              onError={() => {}}
+              width="100"
+              theme="outline"
+              size="medium"
+              text="signin"
+              shape="rectangular"
+            />
+          </GoogleOAuthProvider>
         )}
       </div>
     </nav>

@@ -46,8 +46,7 @@ app.add_middleware(
 
 PROFILES_JSON_PATH = os.getenv("PROFILES_JSON_PATH") 
 
-if not PROFILES_JSON_PATH:
-    PROFILES_JSON_PATH = "profiles.json"
+
 
 if not os.path.exists(PROFILES_JSON_PATH):
     with open(PROFILES_JSON_PATH, "w") as f:

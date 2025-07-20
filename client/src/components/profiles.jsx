@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Code, Globe, Monitor, Plus, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import AddProfileModal from './AddProfileModal';
 import Navbar from './Navbar';
-import LoginPopup from './LoginPopup';
 import { useAuth } from '../contexts/AuthContext';
 import '../stylesheets/profiles.css';
 
