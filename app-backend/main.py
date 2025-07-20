@@ -14,8 +14,23 @@ import webbrowser
 import requests # type: ignore
 import platform
 import uuid
+from database import users_collection
+from models.users import User
+from bson import ObjectId
 
 load_dotenv()
+
+def convert_mongo_document(doc):
+    if doc is None:
+        return None
+    doc_copy = doc.copy()
+    if "_id" in doc_copy:
+        doc_copy["_id"] = str(doc_copy["_id"])
+    if "created_at" in doc_copy:
+        doc_copy["created_at"] = doc_copy["created_at"].isoformat()
+    if "last_login" in doc_copy:
+        doc_copy["last_login"] = doc_copy["last_login"].isoformat()
+    return doc_copy
 
 app = FastAPI()
 
@@ -31,9 +46,22 @@ app.add_middleware(
 
 PROFILES_JSON_PATH = os.getenv("PROFILES_JSON_PATH") 
 
+if not PROFILES_JSON_PATH:
+    PROFILES_JSON_PATH = "profiles.json"
+
 if not os.path.exists(PROFILES_JSON_PATH):
     with open(PROFILES_JSON_PATH, "w") as f:
         json.dump({"profiles": []}, f, indent=2)
+else:
+    try:
+        with open(PROFILES_JSON_PATH, "r") as f:
+            content = f.read().strip()
+            if not content:
+                with open(PROFILES_JSON_PATH, "w") as f:
+                    json.dump({"profiles": []}, f, indent=2)
+    except (json.JSONDecodeError, FileNotFoundError):
+        with open(PROFILES_JSON_PATH, "w") as f:
+            json.dump({"profiles": []}, f, indent=2)
 
 oauth = OAuth()
 oauth.register(
@@ -50,8 +78,11 @@ class ProfileRequest(BaseModel):
 def load_profiles():
     try:
         with open(PROFILES_JSON_PATH, "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
+            content = f.read().strip()
+            if not content:
+                return {"profiles": []}
+            return json.loads(content)
+    except (FileNotFoundError, json.JSONDecodeError):
         return {"profiles": []}
 
 def save_profiles(profiles_data):
@@ -227,13 +258,63 @@ async def google_login(request: Request):
     token = data.get("credential")
     if not token:
         return JSONResponse(content={"error": "Missing credential"}, status_code=400)
+    
     google_resp = requests.get(
         f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
     )
     if google_resp.status_code != 200:
         return JSONResponse(content={"error": "Invalid token"}, status_code=401)
+    
     user_info = google_resp.json()
-    return JSONResponse(content={"user": user_info})
+    email = user_info.get("email")
+    name = user_info.get("name", "")
+    picture = user_info.get("picture", "")
+    google_id = user_info.get("sub", "")
+    
+    if not email:
+        return JSONResponse(content={"error": "Email not found in token"}, status_code=400)
+    
+    current_time = datetime.utcnow()
+    
+    existing_user = await users_collection.find_one({"email": email})
+    
+    if existing_user:
+        await users_collection.update_one(
+            {"email": email},
+            {"$set": {"last_login": current_time}}
+        )
+        existing_user["last_login"] = current_time
+        user_data = convert_mongo_document(existing_user)
+    else:
+        new_user = User(
+            email=email,
+            name=name,
+            picture=picture,
+            google_id=google_id,
+            created_at=current_time,
+            last_login=current_time
+        )
+        result = await users_collection.insert_one(new_user.dict())
+        user_data = convert_mongo_document(new_user.dict())
+        user_data["_id"] = str(result.inserted_id)
+    
+    return JSONResponse(content={"user": user_data})
+
+
+@app.get("/api/users")
+async def get_users():
+    users = []
+    async for user in users_collection.find():
+        users.append(convert_mongo_document(user))
+    return JSONResponse(content={"users": users})
+
+
+@app.get("/api/users/{email}")
+async def get_user_by_email(email: str):
+    user = await users_collection.find_one({"email": email})
+    if not user:
+        return JSONResponse(content={"error": "User not found"}, status_code=404)
+    return JSONResponse(content={"user": convert_mongo_document(user)})
 
 
 if __name__ == "__main__":

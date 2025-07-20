@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from datetime import datetime
 
@@ -18,3 +18,11 @@ class UserOut(BaseModel):
     username: str
     email: EmailStr
     date: Optional[datetime]
+
+class User(BaseModel):
+    email: str
+    name: str
+    picture: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    last_login: datetime = Field(default_factory=datetime.utcnow)
+    google_id: Optional[str] = None
