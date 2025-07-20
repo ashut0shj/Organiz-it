@@ -14,8 +14,9 @@ import webbrowser
 import requests # type: ignore
 import platform
 import uuid
-from database import users_collection
+from database import users_collection, profiles_collection
 from models.users import User
+from models.profiles import Profile, App
 from bson import ObjectId
 
 load_dotenv()
@@ -30,6 +31,10 @@ def convert_mongo_document(doc):
         doc_copy["created_at"] = doc_copy["created_at"].isoformat()
     if "last_login" in doc_copy:
         doc_copy["last_login"] = doc_copy["last_login"].isoformat()
+    if "date_created" in doc_copy:
+        doc_copy["date_created"] = doc_copy["date_created"].isoformat()
+    if "last_used" in doc_copy:
+        doc_copy["last_used"] = doc_copy["last_used"].isoformat()
     return doc_copy
 
 app = FastAPI()
@@ -314,6 +319,70 @@ async def get_user_by_email(email: str):
     if not user:
         return JSONResponse(content={"error": "User not found"}, status_code=404)
     return JSONResponse(content={"user": convert_mongo_document(user)})
+
+
+@app.post("/api/sync-profiles")
+async def sync_profiles(request: Request):
+    data = await request.json()
+    user_email = data.get("user_email")
+    profiles = data.get("profiles", [])
+    
+    if not user_email:
+        return JSONResponse(content={"error": "User email is required"}, status_code=400)
+    
+    try:
+        for profile_data in profiles:
+            date_created_str = profile_data.get("date_created", datetime.utcnow().isoformat())
+            last_used_str = profile_data.get("last_used", datetime.utcnow().isoformat())
+            
+            try:
+                date_created = datetime.fromisoformat(date_created_str.replace('Z', '+00:00'))
+            except ValueError:
+                date_created = datetime.utcnow()
+                
+            try:
+                last_used = datetime.fromisoformat(last_used_str.replace('Z', '+00:00'))
+            except ValueError:
+                last_used = datetime.utcnow()
+            
+            profile = Profile(
+                id=profile_data.get("id"),
+                user_email=user_email,
+                name=profile_data["name"],
+                color=profile_data.get("color", "#6a49ff"),
+                emoji=profile_data.get("emoji", ""),
+                date_created=date_created,
+                last_used=last_used,
+                apps=[App(app_name=app["app_name"], url=app.get("url", "")) for app in profile_data.get("apps", [])]
+            )
+            
+            existing_profile = await profiles_collection.find_one({
+                "user_email": user_email,
+                "id": profile_data.get("id")
+            })
+            
+            if existing_profile:
+                await profiles_collection.update_one(
+                    {"user_email": user_email, "id": profile_data.get("id")},
+                    {"$set": profile.dict()}
+                )
+            else:
+                await profiles_collection.insert_one(profile.dict())
+        
+        return JSONResponse(content={"status": "success", "message": f"Synced {len(profiles)} profiles"})
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+
+@app.get("/api/profiles/{user_email}")
+async def get_user_profiles(user_email: str):
+    try:
+        profiles = []
+        async for profile in profiles_collection.find({"user_email": user_email}):
+            profiles.append(convert_mongo_document(profile))
+        return JSONResponse(content={"profiles": profiles})
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
 
 
 if __name__ == "__main__":

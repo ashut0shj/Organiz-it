@@ -8,12 +8,45 @@ import { useNavigate } from 'react-router-dom';
 const Navbar = ({ profiles }) => {
   const { user, logout, login } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const navigate = useNavigate();
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
   // Calculate total workspaces and total apps
   const totalWorkspaces = profiles.length;
   const totalApps = profiles.reduce((total, profile) => total + (profile.apps ? profile.apps.length : 0), 0);
+
+  const handleSync = async () => {
+    if (!user || !user.email) {
+      console.error("No user email available for sync");
+      return;
+    }
+    
+    setIsSyncing(true);
+    try {
+      const response = await fetch(`${API_BASE}/api/sync-profiles`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_email: user.email,
+          profiles: profiles
+        }),
+      });
+      
+      const data = await response.json();
+      if (data.status === "success") {
+        console.log("Profiles synced successfully");
+      } else {
+        console.error("Sync failed:", data.error);
+      }
+    } catch (error) {
+      console.error("Error syncing profiles:", error);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   return (
     <nav className="navbar">
@@ -29,8 +62,10 @@ const Navbar = ({ profiles }) => {
         <button
           className="navbar-sync-btn"
           title="Sync"
+          onClick={handleSync}
+          disabled={isSyncing}
         >
-          <RefreshCw size={20} color="#6a49ff" />
+          <RefreshCw size={20} color="#6a49ff" className={isSyncing ? "spinning" : ""} />
         </button>
         {user && user.picture ? (
           <div className="navbar-profile-img-wrapper">
