@@ -1,4 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&family=SF+Pro+Text:wght@400;500;600&display=swap');
+/* public/fonts.css */
+
+/* inter-regular - latin */
+@font-face {
+  font-display: swap; 
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./fonts/inter-v19-latin-regular.woff2') format('woff2'); 
+}
+/* inter-500 - latin */
+@font-face {
+  font-display: swap; 
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  src: url('./fonts/inter-v19-latin-500.woff2') format('woff2'); 
+}
+/* inter-600 - latin */
+@font-face {
+  font-display: swap; 
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  src: url('./fonts/inter-v19-latin-600.woff2') format('woff2'); 
+}
+/* inter-700 - latin */
+@font-face {
+  font-display: swap; 
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  src: url('./fonts/inter-v19-latin-700.woff2') format('woff2'); 
+}
 
 .modal-overlay {
   position: fixed;
@@ -11,7 +44,7 @@
   z-index: 1000;
   padding: 20px;
   animation: fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  font-family: 'SF Pro Text', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .modal-container {
@@ -38,7 +71,7 @@
 }
 
 .modal-title {
-  font-family: 'SF Pro Display', 'Inter', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-size: 24px;
   font-weight: 600;
   color: #1d1d1f;
@@ -101,7 +134,7 @@
 
 .form-label {
   display: block;
-  font-family: 'SF Pro Text', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: #1d1d1f;
@@ -114,7 +147,7 @@
   padding: 14px 18px;
   border: 1.5px solid rgba(0, 0, 0, 0.06);
   border-radius: 12px;
-  font-family: 'SF Pro Text', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-size: 16px;
   transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   background: rgba(255, 255, 255, 0.8);
@@ -151,7 +184,7 @@
   color: white;
   border: none;
   border-radius: 12px;
-  font-family: 'SF Pro Text', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
@@ -229,7 +262,7 @@
   padding: 10px 14px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 10px;
-  font-family: 'SF Pro Text', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-size: 15px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
@@ -282,7 +315,7 @@
 
 .field-label {
   display: block;
-  font-family: 'SF Pro Text', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: #6d6d70;
@@ -304,7 +337,7 @@
   padding: 12px 16px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 10px;
-  font-family: 'SF Pro Text', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-size: 15px;
   transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   background: rgba(255, 255, 255, 0.8);
@@ -359,7 +392,7 @@
   background: none;
   border: none;
   color: #007aff;
-  font-family: 'SF Pro Text', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -395,7 +428,7 @@
   backdrop-filter: blur(10px);
   color: #1d1d1f;
   border-radius: 12px;
-  font-family: 'SF Pro Text', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-weight: 500;
   font-size: 15px;
   cursor: pointer;
@@ -421,7 +454,7 @@
   color: white;
   border: none;
   border-radius: 12px;
-  font-family: 'SF Pro Text', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;

@@ -1,25 +1,39 @@
-from fastapi import FastAPI, Request, APIRouter # type: ignore
-from fastapi.responses import RedirectResponse, JSONResponse # type: ignore
-from fastapi.middleware.cors import CORSMiddleware # type: ignore
-from starlette.middleware.sessions import SessionMiddleware # type: ignore
-from authlib.integrations.starlette_client import OAuth # type: ignore
-from dotenv import load_dotenv
-from pydantic import BaseModel # type: ignore
-import subprocess
+import sys
 import os
-import urllib.parse
 import json
-from datetime import datetime
 import webbrowser
-import requests # type: ignore
+import subprocess
 import platform
 import uuid
+from datetime import datetime
+
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
+from authlib.integrations.starlette_client import OAuth
+from dotenv import load_dotenv
+from pydantic import BaseModel
+from bson import ObjectId
+
 from database import users_collection, profiles_collection
 from models.users import User
 from models.profiles import Profile, App
-from bson import ObjectId
 
-load_dotenv()
+# --- Path Fix ---
+# This creates a reliable path that works in both development and when packaged.
+if getattr(sys, 'frozen', False):
+    # If the application is run as a bundled/packaged executable
+    base_path = os.path.dirname(sys.executable)
+else:
+    # If the application is run as a normal Python script
+    base_path = os.path.dirname(os.path.abspath(__file__))
+
+# Load environment variables from a .env file located next to the executable
+dotenv_path = os.path.join(base_path, '.env')
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path)
+# --- End Path Fix ---
 
 def convert_mongo_document(doc):
     if doc is None:
@@ -27,19 +41,15 @@ def convert_mongo_document(doc):
     doc_copy = doc.copy()
     if "_id" in doc_copy:
         doc_copy["_id"] = str(doc_copy["_id"])
-    if "created_at" in doc_copy:
-        doc_copy["created_at"] = doc_copy["created_at"].isoformat()
-    if "last_login" in doc_copy:
-        doc_copy["last_login"] = doc_copy["last_login"].isoformat()
-    if "date_created" in doc_copy:
-        doc_copy["date_created"] = doc_copy["date_created"].isoformat()
-    if "last_used" in doc_copy:
-        doc_copy["last_used"] = doc_copy["last_used"].isoformat()
+    # Convert datetime objects to ISO format strings
+    for key, value in doc_copy.items():
+        if isinstance(value, datetime):
+            doc_copy[key] = value.isoformat()
     return doc_copy
 
 app = FastAPI()
 
-app.add_middleware(SessionMiddleware, secret_key="super-secret-session-key")
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY", "a-super-secret-key"))
 
 app.add_middleware(
     CORSMiddleware,
@@ -49,18 +59,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-PROFILES_JSON_PATH = os.getenv("PROFILES_JSON_PATH") 
+# Use the reliable base_path to locate the profiles.json file
+PROFILES_JSON_PATH = os.path.join(base_path, "profiles.json")
 
-
-
+# Initialize profiles.json if it doesn't exist or is empty
 if not os.path.exists(PROFILES_JSON_PATH):
     with open(PROFILES_JSON_PATH, "w") as f:
         json.dump({"profiles": []}, f, indent=2)
 else:
     try:
         with open(PROFILES_JSON_PATH, "r") as f:
-            content = f.read().strip()
-            if not content:
+            if not f.read().strip():
                 with open(PROFILES_JSON_PATH, "w") as f:
                     json.dump({"profiles": []}, f, indent=2)
     except (json.JSONDecodeError, FileNotFoundError):
@@ -154,7 +163,7 @@ async def home():
     return {"message": "FastAPI Google Login Backend Running"}
 
 @app.get("/profiles")
-async def get_profiles():
+async def get_profiles_endpoint():
     profiles_data = load_profiles()
     return JSONResponse(content=profiles_data)
 
@@ -168,10 +177,7 @@ async def launch_profile(req: ProfileRequest):
             profile_id = profile["id"]
             break
     if not profile_id:
-        return JSONResponse(
-            content={"status": "error", "message": f"Profile '{profile_name}' not found."},
-            status_code=404
-        )
+        return JSONResponse(content={"status": "error", "message": f"Profile '{profile_name}' not found."}, status_code=404)
     try:
         open_profile_apps(profile_id)
         return JSONResponse(content={"status": "success", "message": f"Profile '{profile_name}' launched."})
@@ -201,10 +207,7 @@ async def delete_profile(profile_id: str):
     original_length = len(profiles_data["profiles"])
     profiles_data["profiles"] = [p for p in profiles_data["profiles"] if str(p["id"]) != str(profile_id)]
     if len(profiles_data["profiles"]) == original_length:
-        return JSONResponse(
-            content={"status": "error", "message": f"Profile with ID '{profile_id}' not found."},
-            status_code=404
-        )
+        return JSONResponse(content={"status": "error", "message": f"Profile with ID '{profile_id}' not found."}, status_code=404)
     save_profiles(profiles_data)
     return JSONResponse(content={"status": "success", "message": f"Profile deleted successfully."})
 
@@ -226,15 +229,12 @@ async def update_profile(profile_id: str, profile_data: dict):
             profile_found = True
             break
     if not profile_found:
-        return JSONResponse(
-            content={"status": "error", "message": f"Profile with ID '{profile_id}' not found."},
-            status_code=404
-        )
+        return JSONResponse(content={"status": "error", "message": f"Profile with ID '{profile_id}' not found."}, status_code=404)
     save_profiles(profiles_data)
     return JSONResponse(content={"status": "success", "message": f"Profile updated successfully."})
 
 @app.get("/profilenames")
-def get_profiles():
+def get_profile_names():
     with open(PROFILES_JSON_PATH, "r") as f:
         return json.load(f)
 
@@ -256,54 +256,51 @@ async def track(request: Request):
         json.dump(profiles_data, f, indent=2)
     return {"status": "added"}
 
-@app.post("/api/auth/google")
-async def google_login(request: Request):
-    data = await request.json()
-    token = data.get("credential")
-    if not token:
-        return JSONResponse(content={"error": "Missing credential"}, status_code=400)
-    
-    google_resp = requests.get(
-        f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
-    )
-    if google_resp.status_code != 200:
-        return JSONResponse(content={"error": "Invalid token"}, status_code=401)
-    
-    user_info = google_resp.json()
-    email = user_info.get("email")
-    name = user_info.get("name", "")
-    picture = user_info.get("picture", "")
-    google_id = user_info.get("sub", "")
-    
-    if not email:
-        return JSONResponse(content={"error": "Email not found in token"}, status_code=400)
-    
-    current_time = datetime.utcnow()
-    
-    existing_user = await users_collection.find_one({"email": email})
-    
-    if existing_user:
-        await users_collection.update_one(
-            {"email": email},
-            {"$set": {"last_login": current_time}}
-        )
-        existing_user["last_login"] = current_time
-        user_data = convert_mongo_document(existing_user)
-    else:
-        new_user = User(
-            email=email,
-            name=name,
-            picture=picture,
-            google_id=google_id,
-            created_at=current_time,
-            last_login=current_time
-        )
-        result = await users_collection.insert_one(new_user.dict())
-        user_data = convert_mongo_document(new_user.dict())
-        user_data["_id"] = str(result.inserted_id)
-    
-    return JSONResponse(content={"user": user_data})
+class AuthCode(BaseModel):
+    code: str
 
+@app.post("/auth/google")
+async def google_login_endpoint(auth_code: AuthCode, request: Request):
+    try:
+        token = await oauth.google.authorize_access_token(request, code=auth_code.code, redirect_uri='http://localhost:54321', state=None)
+        user_info = await oauth.google.parse_id_token(request, token)
+        
+        email = user_info.get("email")
+        name = user_info.get("name", "")
+        picture = user_info.get("picture", "")
+        google_id = user_info.get("sub", "")
+        
+        if not email:
+            return JSONResponse(content={"error": "Email not found in token"}, status_code=400)
+        
+        current_time = datetime.utcnow()
+        
+        existing_user = await users_collection.find_one({"email": email})
+        
+        if existing_user:
+            await users_collection.update_one(
+                {"email": email},
+                {"$set": {"last_login": current_time, "picture": picture, "name": name}}
+            )
+            user_data = convert_mongo_document(await users_collection.find_one({"email": email}))
+        else:
+            new_user = User(
+                email=email,
+                name=name,
+                picture=picture,
+                google_id=google_id,
+                created_at=current_time,
+                last_login=current_time
+            )
+            result = await users_collection.insert_one(new_user.dict())
+            user_data = new_user.dict()
+            user_data["_id"] = str(result.inserted_id)
+            user_data = convert_mongo_document(user_data)
+        
+        return JSONResponse(content={"user": user_data})
+    except Exception as e:
+        print(f"Authentication error: {e}")
+        return JSONResponse(content={"error": "Authentication failed", "details": str(e)}, status_code=500)
 
 @app.get("/api/users")
 async def get_users():
@@ -312,14 +309,12 @@ async def get_users():
         users.append(convert_mongo_document(user))
     return JSONResponse(content={"users": users})
 
-
 @app.get("/api/users/{email}")
 async def get_user_by_email(email: str):
     user = await users_collection.find_one({"email": email})
     if not user:
         return JSONResponse(content={"error": "User not found"}, status_code=404)
     return JSONResponse(content={"user": convert_mongo_document(user)})
-
 
 @app.post("/api/sync-profiles")
 async def sync_profiles(request: Request):
@@ -373,7 +368,6 @@ async def sync_profiles(request: Request):
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
-
 @app.get("/api/profiles/{user_email}")
 async def get_user_profiles(user_email: str):
     try:
@@ -384,7 +378,13 @@ async def get_user_profiles(user_email: str):
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
-
 if __name__ == "__main__":
-    import uvicorn # type: ignore
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    import uvicorn
+
+    is_bundled = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=8000,
+        reload=not is_bundled
+    )

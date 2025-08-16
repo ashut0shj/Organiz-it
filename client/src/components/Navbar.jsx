@@ -1,16 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../stylesheets/navbar.css';
 import { useAuth } from '../contexts/AuthContext';
-import { RefreshCw } from 'lucide-react';
-import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { RefreshCw, LogIn } from 'lucide-react'; // Added LogIn for the button
 import { useNavigate } from 'react-router-dom';
 
 const Navbar = ({ profiles }) => {
-  const { user, logout, login } = useAuth();
+  // Destructure the new loginWithCode function from our updated AuthContext
+  const { user, logout, loginWithCode } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const navigate = useNavigate();
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+  // This new useEffect hook listens for the auth code from the Electron main process
+  useEffect(() => {
+    const removeListener = window.electronAPI.onGoogleOAuthCode((code) => {
+      console.log('Received auth code in React:', code);
+      // When the code is received, call the login function in our context
+      loginWithCode(code);
+    });
+
+    // Cleanup the listener when the component is no longer on screen
+    return () => {
+      removeListener();
+    };
+  }, [loginWithCode]);
+
 
   // Calculate total workspaces and total apps
   const totalWorkspaces = profiles.length;
@@ -48,11 +63,18 @@ const Navbar = ({ profiles }) => {
     }
   };
 
+  // This function is called when the new login button is clicked
+  const handleLogin = () => {
+    // This tells the main process to open the Google login window
+    window.electronAPI.startGoogleLogin();
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-left">
         <div className="navbar-logo">
-          <img src="/vite.svg" alt="Organiz-it Logo" className="logo-image" />
+          {/* Use a relative path for the logo to work in production */}
+          <img src="./vite.svg" alt="Organiz-it Logo" className="logo-image" />
         </div>
         <span className="navbar-title">workspacer</span>
       </div>
@@ -106,32 +128,15 @@ const Navbar = ({ profiles }) => {
             )}
           </div>
         ) : (
-          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-            <GoogleLogin
-              onSuccess={async credentialResponse => {
-                const res = await fetch(`${API_BASE}/api/auth/google`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ credential: credentialResponse.credential }),
-                });
-                const data = await res.json();
-                if (data.user) {
-                  login(data.user);
-                  navigate('/');
-                }
-              }}
-              onError={() => {}}
-              width="100"
-              theme="outline"
-              size="medium"
-              text="signin"
-              shape="rectangular"
-            />
-          </GoogleOAuthProvider>
+          // --- THIS IS THE REPLACEMENT FOR THE GOOGLE LOGIN COMPONENT ---
+          <button onClick={handleLogin} className="navbar-login-btn">
+            <LogIn size={18} style={{ marginRight: '8px' }}/>
+            Sign In
+          </button>
         )}
       </div>
     </nav>
   );
 };
 
-export default Navbar; 
+export default Navbar;

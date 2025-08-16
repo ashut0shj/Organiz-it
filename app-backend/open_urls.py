@@ -1,12 +1,35 @@
 import sys
 import os
 import json
+import shutil
 import subprocess
 import platform
 import webbrowser
 from datetime import datetime
 
-PROFILE_JSON_PATH = os.path.join(os.path.dirname(__file__), "profiles", "profiles.json")
+def resource_path(relative_path):
+    """ Get absolute path to resource (works for dev and PyInstaller) """
+    try:
+        base_path = sys._MEIPASS  # Temp folder when bundled
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+# Path to default profiles inside the exe (read-only when bundled)
+DEFAULT_PROFILE_PATH = resource_path(os.path.join("profiles", "profiles.json"))
+
+# Path where we store the editable user version
+USER_PROFILE_PATH = os.path.join(os.path.expanduser("~"), ".organizit_profiles.json")
+
+# If user profile file doesn't exist, copy from default
+if not os.path.exists(USER_PROFILE_PATH):
+    try:
+        shutil.copy(DEFAULT_PROFILE_PATH, USER_PROFILE_PATH)
+    except Exception as e:
+        print(f"Error copying default profiles: {e}")
+
+# Now always read/write from the editable path
+PROFILE_JSON_PATH = USER_PROFILE_PATH
 
 def detect_os():
     if os.name == 'nt' or platform.system().lower() == 'windows':
